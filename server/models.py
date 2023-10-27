@@ -1,6 +1,8 @@
 from sqlalchemy import Column, Integer, String, Date, ForeignKey
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, validates
 from app import db
+from datetime import datetime
+from datetime import date
 
 class User(db.Model):
     __tablename__ = 'users'
