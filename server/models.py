@@ -1,8 +1,7 @@
 from sqlalchemy import Column, Integer, String, Date, ForeignKey
 from sqlalchemy.orm import relationship, validates
-from app import db
 from datetime import datetime
-from datetime import date
+from app import db
 
 class User(db.Model):
     __tablename__ = 'users'
@@ -15,6 +14,17 @@ class User(db.Model):
     astrological_sign = relationship("AstrologicalSign", back_populates="users")
     matches = relationship("UserMatch", back_populates="user")
     serialize_rules = ('-user_matches.user',)
+
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'birthday': self.birthday,
+            'username': self.username,
+            'password': self.password,
+            'astrological_sign_id': self.astrological_sign_id
+        }
 
     @validates('name')
     def validate_name(self, key, name):
