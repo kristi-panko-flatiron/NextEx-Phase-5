@@ -1,34 +1,60 @@
 #!/usr/bin/env python3
 
-from flask import request, make_response, session, jsonify
+from flask import request, make_response, session
 from flask_restful import Resource, Api
-from datetime import datetime, date
+from datetime import datetime
+from werkzeug.security import check_password_hash, generate_password_hash
 import requests
 
 from config import app, db
 from models import *
 
 from flask import Flask, request, jsonify
-app = Flask(__name__)
 
 api = Api(app)
 
+def calculate_astrological_sign(birthdate):
+    if (birthdate.month == 3 and birthdate.day >= 21) or (birthdate.month == 4 and birthdate.day <= 19):
+        return 1  # Aries
+    elif (birthdate.month == 4 and birthdate.day >= 20) or (birthdate.month == 5 and birthdate.day <= 20):
+        return 2  # Taurus
+    elif (birthdate.month == 5 and birthdate.day >= 21) or (birthdate.month == 6 and birthdate.day <= 20):
+        return 3  # Gemini
+    elif (birthdate.month == 6 and birthdate.day >= 21) or (birthdate.month == 7 and birthdate.day <= 22):
+        return 4  # Cancer
+    elif (birthdate.month == 7 and birthdate.day >= 23) or (birthdate.month == 8 and birthdate.day <= 22):
+        return 5  # Leo
+    elif (birthdate.month == 8 and birthdate.day >= 23) or (birthdate.month == 9 and birthdate.day <= 22):
+        return 6  # Virgo
+    elif (birthdate.month == 9 and birthdate.day >= 23) or (birthdate.month == 10 and birthdate.day <= 22):
+        return 7  # Libra
+    elif (birthdate.month == 10 and birthdate.day >= 23) or (birthdate.month == 11 and birthdate.day <= 21):
+        return 8  # Scorpio
+    elif (birthdate.month == 11 and birthdate.day >= 22) or (birthdate.month == 12 and birthdate.day <= 21):
+        return 9  # Sagittarius
+    elif (birthdate.month == 12 and birthdate.day >= 22) or (birthdate.month == 1 and birthdate.day <= 19):
+        return 10  # Capricorn
+    elif (birthdate.month == 1 and birthdate.day >= 20) or (birthdate.month == 2 and birthdate.day <= 18):
+        return 11  # Aquarius
+    elif (birthdate.month == 2 and birthdate.day >= 19) or (birthdate.month == 3 and birthdate.day <= 20):
+        return 12  # Pisces
+    else:
+        raise ValueError("Invalid birthdate or astrological sign not determined.")
+
 class UserRegistration(Resource):
     def post(self):
-        data = request.get_json()
+        data = request.json
         if not data:
             return make_response("No input data provided", 400)
-
-        name = data.get('name')
-        username = data.get('username')
-        password = data.get('password')
-        birthday = data.get('birthday')
-        astrological_sign_id = data.get('astrological_sign_id')
+        name = data['name']
+        username = data['username']
+        password = data['password']
+        birthday = data['birthday']
+        user_birthday = datetime.strptime(birthday, '%Y-%m-%d').date()
+        astrological_sign_id = calculate_astrological_sign(user_birthday)
         if not all([name, username, password, birthday, astrological_sign_id]):
             return make_response("Missing required fields", 400)
-
         new_user = User(name=name, username=username, password=password, birthday=birthday, astrological_sign_id=astrological_sign_id)
-
         try:
             db.session.add(new_user)
             db.session.commit()
@@ -37,52 +63,180 @@ class UserRegistration(Resource):
             db.session.rollback()
             return make_response(f"Failed to register user: {str(e)}", 500)
 
-
 class UserLogin(Resource):
     def post(self):
-        # Add your user login logic here
-        pass
+        data = request.json
+        if not data:
+            return make_response("No input data provided", 400)
+        username = data['username']
+        password = data['password']
+        user = User.query.filter_by(username=username).first()
+        if user and check_password_hash(user.password, password):
+            session['user_id'] = user.id  # Set the user_id in the session
+            return make_response("Login successful", 200)
+        else:
+            return make_response("Invalid credentials", 401)
+
+
 
 class UserProfile(Resource):
-    def get(self):
-        # Add your get user profile logic here
-        pass
-
     def post(self):
-        # Add your create user profile logic here
-        pass
+        data = request.json
+        if not data:
+            return make_response("No input data provided", 400)
+        name = data['name']
+        birthday = data['birthday']
+        username = data['username']
+        password = data['password']
+        astrological_sign_id = data['astrological_sign_id']
+        if not all([name, birthday, username, password, astrological_sign_id]):
+            return make_response("Missing required fields", 400)
+        new_profile = User(
+            name=name,
+            birthday=birthday,
+            username=username,
+            password=password,
+            astrological_sign_id=astrological_sign_id
+        )
+        try:
+            db.session.add(new_profile)
+            db.session.commit()
+            return make_response(f"User profile created successfully: {new_profile.to_dict()}", 201)
+        except Exception as e:
+            db.session.rollback()
+            return make_response(f"Failed to create user profile: {str(e)}", 500)
 
 class UserManagement(Resource):
     def get(self, user_id):
-        # Add your get user by ID logic here
-        pass
+        user = User.query.filter_by(id=user_id).first()
+        if not user:
+            return make_response(f"No user found with ID: {user_id}", 404)
+        return make_response(user.to_dict(), 200)
+
 
     def patch(self, user_id):
-        # Add your update user profile logic here
-        pass
+        data = request.get_json()
+        if not data:
+            return make_response("No input data provided", 400)
+        user = User.query.filter_by(id=user_id).first()
+        if not user:
+            return make_response(f"No user found with ID: {user_id}", 404)
+        if 'name' in data:
+            user.name = data['name']
+        if 'username' in data:
+            user.username = data['username']
+        if 'password' in data:
+            user.password = data['password']
+        if 'birthday' in data:
+            user.birthday = data['birthday']
+        if 'astrological_sign_id' in data:
+            user.astrological_sign_id = data['astrological_sign_id']
+        try:
+            db.session.commit()
+            return make_response(user.to_dict(), 200)
+        except Exception as e:
+            db.session.rollback()
+            return make_response(f"Failed to update user: {str(e)}", 500)
 
     def delete(self, user_id):
-        # Add your delete user logic here
-        pass
+        user = User.query.filter_by(id=user_id).first()
+        if not user:
+            return make_response(f"No user found with ID: {user_id}", 404)
+        try:
+            db.session.delete(user)
+            db.session.commit()
+            return make_response(f"User with ID {user_id} has been deleted", 200)
+        except Exception as e:
+            db.session.rollback()
+            return make_response(f"Failed to delete user: {str(e)}", 500)
 
 class AstrologicalSignAssignment(Resource):
     def post(self):
-        # Add your astrological sign assignment logic here
-        pass
+        data = request.json
+        if not data:
+            return make_response("No input data provided", 400)
+        name = data["name"]
+        username = data["username"]
+        password = data["password"]
+        birthday = data["birthday"]
+        try:
+            user_birthday = datetime.strptime(birthday, "%Y-%m-%d")
+            astrological_sign_id = calculate_astrological_sign(user_birthday)
+        except ValueError as e:
+            return make_response(str(e), 400)
+        if not all([name, username, password, birthday, astrological_sign_id]):
+            return make_response("Missing required fields", 400)
+        new_user = User(
+            name=name,
+            username=username,
+            password=password,
+            birthday=birthday,
+            astrological_sign_id=astrological_sign_id
+        )
+        try:
+            db.session.add(new_user)
+            db.session.commit()
+            return make_response(new_user.to_dict(), 201)
+        except Exception as e:
+            db.session.rollback()
+            return make_response(f"Failed to register user: {str(e)}", 500)
 
 class UsersBySign(Resource):
     def get(self, sign_id):
-        # Add your logic to get users by sign ID here
-        pass
+        users = User.query.filter_by(astrological_sign_id=sign_id).all()
+        if not users:
+            return make_response("No users found for the specified sign ID", 404)
+        user_list = [user.to_dict() for user in users]
+        return make_response(user_list, 200)
 
 class Favorites(Resource):
     def get(self):
-        # Add your logic to get favorites here
-        pass
+        favorites = Favorites.query.all()
+        if not favorites:
+            return make_response("No favorites found", 404)
+        favorite_list = [favorite.to_dict() for favorite in favorites]
+        return make_response(favorite_list, 200)
 
+
+class Favorites(Resource):
     def post(self):
-        # Add your logic to add favorites here
-        pass
+        data = request.json
+        if not data:
+            return make_response("No input data provided", 400)
+        user_id = data.get("user_id")
+        best_match_id = data.get("best_match_id")
+        if not all([user_id, best_match_id]):
+            return make_response("Missing required fields", 400)
+        user = User.query.get(user_id)
+        if not user:
+            return make_response(f"User with ID {user_id} not found", 404)
+        best_match = BestMatch.query.get(best_match_id)
+        if not best_match:
+            return make_response(f"Best match with ID {best_match_id} not found", 404)
+        user.favorites.append(best_match)
+        db.session.commit()
+        return make_response("Favorite added successfully", 201)
+
+    def delete(self):
+        data = request.json
+        if not data:
+            return make_response("No input data provided", 400)
+        user_id = data.get("user_id")
+        best_match_id = data.get("best_match_id")
+        if not all([user_id, best_match_id]):
+            return make_response("Missing required fields", 400)
+        user = User.query.get(user_id)
+        if not user:
+            return make_response(f"User with ID {user_id} not found", 404)
+        best_match = BestMatch.query.get(best_match_id)
+        if not best_match:
+            return make_response(f"Best match with ID {best_match_id} not found", 404)
+        if best_match in user.favorites:
+            user.favorites.remove(best_match)
+            db.session.commit()
+            return make_response("Favorite removed successfully", 200)
+        else:
+            return make_response("The specified favorite does not exist for the user", 404)
 
 if __name__ == '__main__':
     api.add_resource(UserRegistration, '/register')

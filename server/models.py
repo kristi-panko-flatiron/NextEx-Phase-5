@@ -13,6 +13,7 @@ class User(db.Model):
     astrological_sign_id = Column(Integer, ForeignKey('astrological_signs.id'))
     astrological_sign = relationship("AstrologicalSign", back_populates="users")
     matches = relationship("UserMatch", back_populates="user")
+    favorites = relationship("Favorites", back_populates="user")
     serialize_rules = ('-user_matches.user',)
 
 
@@ -95,4 +96,22 @@ class BestMatch(db.Model):
     astrological_sign_id = Column(Integer, ForeignKey('astrological_signs.id'))
     best_match_name = Column(String(20), nullable=False)
     astrological_sign = relationship("AstrologicalSign", back_populates="best_matches")
-    serialize_rules = ('-astrological_sign.best_matches',)
+    favorites = relationship("Favorites", back_populates="best_match")
+    serialize_rules = ('-astrological_sign.best_matches', '-favorites.best_match',)
+
+class Favorites(db.Model):
+    __tablename__ = 'favorites'
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('users.id'))
+    best_match_id = Column(Integer, ForeignKey('best_matches.id'))
+    user = relationship("User", back_populates="favorites")
+    best_match = relationship("BestMatch", back_populates="favorites")
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'best_match_id': self.best_match_id
+        }
+
+    serialize_rules = ('-user.favorites', '-best_match.favorites',)
