@@ -13,6 +13,13 @@ from flask import Flask, request, jsonify
 
 api = Api(app)
 
+# @app.after_request
+# def after_request(response):
+#     response.headers.add('Access-Control-Allow-Origin', '*')
+#     response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+#     response.headers.add('Access-Control-Allow-Methods', 'GET, PATCH, POST, DELETE, OPTIONS')
+#     return response
+
 def calculate_astrological_sign(birthdate):
     if (birthdate.month == 3 and birthdate.day >= 21) or (birthdate.month == 4 and birthdate.day <= 19):
         return 1  # Aries
@@ -41,6 +48,20 @@ def calculate_astrological_sign(birthdate):
     else:
         raise ValueError("Invalid birthdate or astrological sign not determined.")
 
+class UserLogin(Resource):
+    def post(self):
+        data = request.json
+        if not data:
+            return make_response("No input data provided", 400)
+        username = data['username']
+        password = data['password']
+        user = User.query.filter_by(username=username, password=password).first()
+        if user and check_password_hash(user.password, password):
+            session['user_id'] = user.id 
+            return make_response("Login successful", 200)
+        else:
+            return make_response("Invalid credentials", 401)
+        
 class UserRegistration(Resource):
     def post(self):
         data = request.json
@@ -62,21 +83,6 @@ class UserRegistration(Resource):
         except Exception as e:
             db.session.rollback()
             return make_response(f"Failed to register user: {str(e)}", 500)
-
-class UserLogin(Resource):
-    def post(self):
-        data = request.json
-        if not data:
-            return make_response("No input data provided", 400)
-        username = data['username']
-        password = data['password']
-        user = User.query.filter_by(username=username).first()
-        if user and check_password_hash(user.password, password):
-            session['user_id'] = user.id 
-            return make_response("Login successful", 200)
-        else:
-            return make_response("Invalid credentials", 401)
-
 
 
 class UserProfile(Resource):
@@ -197,7 +203,6 @@ class Favorites(Resource):
         favorite_list = [favorite.to_dict() for favorite in favorites]
         return make_response(favorite_list, 200)
 
-
 class Favorites(Resource):
     def post(self):
         data = request.json
@@ -238,6 +243,19 @@ class Favorites(Resource):
         else:
             return make_response("The specified favorite does not exist for the user", 404)
 
+class BestMatches(Resource):
+    def get(self):
+        astrological_signs = AstrologicalSign.query.all()
+        all_users = User.query.all()  
+        best_matches = {}
+        for sign in astrological_signs:
+            users_for_sign = [user for user in all_users if user.astrological_sign_id == sign.id]
+            matches_data = db.session.query(BestMatch).filter_by(astrological_sign_id=sign.id).all()
+            best_match_names = [match.best_match_name for match in matches_data]
+            best_match_users = [user for user in users_for_sign if user.name in best_match_names]
+            best_matches[sign.sign_name] = best_match_users
+        return make_response(best_matches, 200)
+
 if __name__ == '__main__':
     api.add_resource(UserRegistration, '/register')
     api.add_resource(UserLogin, '/login')
@@ -246,6 +264,7 @@ if __name__ == '__main__':
     api.add_resource(AstrologicalSignAssignment, '/assign_astrological_sign')
     api.add_resource(UsersBySign, '/users_by_sign/<int:sign_id>')
     api.add_resource(Favorites, '/favorites')
+    api.add_resource(BestMatches, '/bestmatches')
     app.run(port=5555, debug=True)
 
 # # Remote library imports

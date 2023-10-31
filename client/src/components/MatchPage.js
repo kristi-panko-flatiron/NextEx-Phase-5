@@ -9,7 +9,7 @@ const MatchPage = () => {
 
     // Fetch users based on astrological sign
     useEffect(() => {
-        axios.get('http://localhost:5555/users_by_sign/<sign_id>')  // Replace <sign_id> with the appropriate sign ID
+        axios.get('http://localhost:5555/users_by_sign/')
             .then(response => {
                 setUsers(response.data);
             })
