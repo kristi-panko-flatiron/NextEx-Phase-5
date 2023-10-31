@@ -5,11 +5,10 @@ const UserProfile = () => {
     const [editing, setEditing] = useState(false);
 
     useEffect(() => {
-        // Fetch user data from the backend API
         fetch('/api/userData')
             .then(response => response.json())
             .then(data => {
-                setUser(data); // Set the fetched user data to the state
+                setUser(data);
             })
             .catch(error => {
                 console.error('Error fetching user data:', error);
@@ -21,22 +20,30 @@ const UserProfile = () => {
     };
 
     const handleSave = () => {
-        // Add logic to save the user's updated information using the PATCH method
-        // Example code to make a PATCH request
         fetch(`/api/users/${user.id}`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(user) // Send the updated user data
+            body: JSON.stringify(user)
         })
             .then(response => response.json())
             .then(data => {
-                // Handle the response data accordingly
                 setEditing(false);
             })
             .catch(error => {
-                // Handle any errors
+                console.error('Error:', error);
+            });
+    };
+
+    const handleDelete = () => {
+        fetch(`/api/users/${user.id}`, {
+            method: 'DELETE'
+        })
+            .then(response => response.json())
+            .then(data => {
+            })
+            .catch(error => {
                 console.error('Error:', error);
             });
     };
@@ -45,22 +52,36 @@ const UserProfile = () => {
         <div>
             {editing ? (
                 <form>
-                    {/* Render form fields for editing the user's information */}
-                    {/* Ensure you populate the form fields with the current user data */}
                     <input
                         type="text"
                         value={user.name}
                         onChange={(e) => setUser({ ...user, name: e.target.value })}
                     />
-                    {/* Add other necessary form fields */}
+                    <input
+                        type="text"
+                        value={user.username}
+                        onChange={(e) => setUser({ ...user, username: e.target.value })}
+                    />
+                    <input
+                        type="text"
+                        value={user.password}
+                        onChange={(e) => setUser({ ...user, password: e.target.value })}
+                    />
+                    <input
+                        type="date"
+                        value={user.birthday}
+                        onChange={(e) => setUser({ ...user, birthday: e.target.value })}
+                    />
                     <button onClick={handleSave}>Save Changes</button>
+                    <button onClick={handleDelete}>Delete Account</button>
                 </form>
             ) : (
                 <div>
-                    {/* Display user's profile information */}
                     <p>Name: {user.name}</p>
-                    {/* Add other necessary user data fields */}
+                    <p>Username: {user.username}</p>
+                    <p>Birthday: {user.birthday}</p>
                     <button onClick={handleEdit}>Edit Profile</button>
+                    <button onClick={handleDelete}>Delete Account</button>
                 </div>
             )}
         </div>

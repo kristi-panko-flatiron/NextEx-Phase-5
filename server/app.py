@@ -72,7 +72,7 @@ class UserLogin(Resource):
         password = data['password']
         user = User.query.filter_by(username=username).first()
         if user and check_password_hash(user.password, password):
-            session['user_id'] = user.id  # Set the user_id in the session
+            session['user_id'] = user.id 
             return make_response("Login successful", 200)
         else:
             return make_response("Invalid credentials", 401)
