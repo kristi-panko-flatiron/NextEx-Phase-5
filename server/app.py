@@ -48,6 +48,23 @@ def calculate_astrological_sign(birthdate):
     else:
         raise ValueError("Invalid birthdate or astrological sign not determined.")
 
+def map_astrological_sign_id_to_name(sign_id):
+    sign_names = {
+        1: 'Aries',
+        2: 'Taurus',
+        3: 'Gemini',
+        4: 'Cancer',
+        5: 'Leo',
+        6: 'Virgo',
+        7: 'Libra',
+        8: 'Scorpio',
+        9: 'Sagittarius',
+        10: 'Capricorn',
+        11: 'Aquarius',
+        12: 'Pisces'
+    }
+    return sign_names.get(sign_id)
+
 class UserLogin(Resource):
     def post(self):
         data = request.json
@@ -55,9 +72,9 @@ class UserLogin(Resource):
             return make_response("No input data provided", 400)
         username = data['username']
         password = data['password']
-        user = User.query.filter_by(username=username, password=password).first()
-        if user and check_password_hash(user.password, password):
-            session['user_id'] = user.id 
+        user = User.query.filter_by(username=username).first()
+        if user and user.authenticate(password):
+            session['user_id'] = user.id
             return make_response("Login successful", 200)
         else:
             return make_response("Invalid credentials", 401)
@@ -75,7 +92,7 @@ class UserRegistration(Resource):
         astrological_sign_id = calculate_astrological_sign(user_birthday)
         if not all([name, username, password, birthday, astrological_sign_id]):
             return make_response("Missing required fields", 400)
-        new_user = User(name=name, username=username, password=password, birthday=birthday, astrological_sign_id=astrological_sign_id)
+        new_user = User(name=name, username=username, password_hash=password, birthday=birthday, astrological_sign_id=astrological_sign_id)
         try:
             db.session.add(new_user)
             db.session.commit()
@@ -86,35 +103,17 @@ class UserRegistration(Resource):
 
 
 class UserProfile(Resource):
-    def post(self):
-        data = request.json
-        if not data:
-            return make_response("No input data provided", 400)
-        name = data['name']
-        birthday = data['birthday']
-        username = data['username']
-        password = data['password']
-        astrological_sign_id = data['astrological_sign_id']
-        if not all([name, birthday, username, password, astrological_sign_id]):
-            return make_response("Missing required fields", 400)
-        new_profile = User(
-            name=name,
-            birthday=birthday,
-            username=username,
-            password=password,
-            astrological_sign_id=astrological_sign_id
-        )
-        try:
-            db.session.add(new_profile)
-            db.session.commit()
-            return make_response(f"User profile created successfully: {new_profile.to_dict()}", 201)
-        except Exception as e:
-            db.session.rollback()
-            return make_response(f"Failed to create user profile: {str(e)}", 500)
+    def get(self, user_id):
+        user = User.query.filter_by(id=user_id).first()
+        if not user:
+            return make_response(f"No user found with ID: {user_id}", 404)
+        user_data = user.to_dict()
+        user_data['astrological_sign'] = map_astrological_sign_id_to_name(user.astrological_sign_id)
+        return make_response(user_data, 200)
 
 class UserManagement(Resource):
     def get(self, user_id):
-        user = User.query.filter_by(id=user_id).first()
+        user = User.query.get(user_id)
         if not user:
             return make_response(f"No user found with ID: {user_id}", 404)
         return make_response(user.to_dict(), 200)
@@ -185,7 +184,7 @@ class AstrologicalSignAssignment(Resource):
             return make_response(new_user.to_dict(), 201)
         except Exception as e:
             db.session.rollback()
-            return make_response(f"Failed to register user: {str(e)}", 500)
+            return make_response(f"Failed to register user sign: {str(e)}", 500)
 
 class UsersBySign(Resource):
     def get(self, sign_id):
@@ -197,13 +196,12 @@ class UsersBySign(Resource):
 
 class Favorites(Resource):
     def get(self):
-        favorites = Favorites.query.all()
+        favorites = Favorite.query.all()
         if not favorites:
             return make_response("No favorites found", 404)
         favorite_list = [favorite.to_dict() for favorite in favorites]
         return make_response(favorite_list, 200)
 
-class Favorites(Resource):
     def post(self):
         data = request.json
         if not data:
@@ -252,9 +250,13 @@ class BestMatches(Resource):
             users_for_sign = [user for user in all_users if user.astrological_sign_id == sign.id]
             matches_data = db.session.query(BestMatch).filter_by(astrological_sign_id=sign.id).all()
             best_match_names = [match.best_match_name for match in matches_data]
-            best_match_users = [user for user in users_for_sign if user.name in best_match_names]
-            best_matches[sign.sign_name] = best_match_users
+            best_match_users = [{
+                "name": user.name,
+                "astrological_sign": map_astrological_sign_id_to_name(user.astrological_sign_id)
+            } for user in users_for_sign if user.name in best_match_names]
+            best_matches[map_astrological_sign_id_to_name(sign.id)] = best_match_users
         return make_response(best_matches, 200)
+
 
 if __name__ == '__main__':
     api.add_resource(UserRegistration, '/register')

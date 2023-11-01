@@ -3,20 +3,19 @@ import axios from 'axios';
 import Card from './Card';
 import FavoritesBar from './FavoritesBar';
 
-const MatchPage = () => {
+const MatchPage = (signId) => {
     const [users, setUsers] = useState([]);
     const [favorites, setFavorites] = useState([]);
 
-    // Fetch users based on astrological sign
     useEffect(() => {
-        axios.get('http://localhost:5555/users_by_sign/')
+        axios.get(`http://localhost:5555/users_by_sign/${signId}`)
             .then(response => {
                 setUsers(response.data);
             })
             .catch(error => {
                 console.error('Error fetching users:', error);
             });
-    }, []);
+    }, [signId]);
 
     const handleAddToFavorites = (user) => {
         setFavorites([...favorites, user]);

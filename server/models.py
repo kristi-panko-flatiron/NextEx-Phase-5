@@ -1,7 +1,9 @@
 from sqlalchemy import Column, Integer, String, Date, ForeignKey
 from sqlalchemy.orm import relationship, validates
 from datetime import datetime
-from app import db
+from sqlalchemy.ext.hybrid import hybrid_property
+from config import db, bcrypt
+
 
 class User(db.Model):
     __tablename__ = 'users'
@@ -9,13 +11,27 @@ class User(db.Model):
     name = Column(String(50), nullable=False)
     birthday = Column(String(50), nullable=False)
     username = Column(String(50), nullable=False)
-    password = Column(String(50), nullable=False)
+    _password_hash = Column(String, nullable=False)
     astrological_sign_id = Column(Integer, ForeignKey('astrological_signs.id'))
     astrological_sign = relationship("AstrologicalSign", back_populates="users")
     matches = relationship("UserMatch", back_populates="user")
-    favorites = relationship("Favorites", back_populates="user")
+    favorites = relationship("Favorite", back_populates="user")
     serialize_rules = ('-user_matches.user',)
 
+    @hybrid_property
+    def password_hash ( self ) :
+        return self._password_hash
+    
+    @password_hash.setter
+    def password_hash ( self, password ) :
+        if password:
+            password_hash = bcrypt.generate_password_hash ( password.encode( 'utf-8' ) )
+            self._password_hash = password_hash.decode( 'utf-8' )
+        else :
+            self.validation_errors.append( "Password validation error goes here!" )
+
+    def authenticate ( self, password ) :
+        return bcrypt.check_password_hash( self._password_hash, password.encode( 'utf-8' ) )
 
     def to_dict(self):
         return {
@@ -39,11 +55,11 @@ class User(db.Model):
             raise ValueError("Username must be provided.")
         return username
 
-    @validates('password')
-    def validate_password(self, key, password):
-        if not password:
-            raise ValueError("Password must be provided.")
-        return password
+    # @validates('password')
+    # def validate_password(self, key, password):
+    #     if not password:
+    #         raise ValueError("Password must be provided.")
+    #     return password
 
     @validates('astrological_sign_id')
     def validate_astrological_sign_id(self, key, astrological_sign_id):
@@ -96,10 +112,10 @@ class BestMatch(db.Model):
     astrological_sign_id = Column(Integer, ForeignKey('astrological_signs.id'))
     best_match_name = Column(String(20), nullable=False)
     astrological_sign = relationship("AstrologicalSign", back_populates="best_matches")
-    favorites = relationship("Favorites", back_populates="best_match")
+    favorites = relationship("Favorite", back_populates="best_match")
     serialize_rules = ('-astrological_sign.best_matches', '-favorites.best_match',)
 
-class Favorites(db.Model):
+class Favorite(db.Model):
     __tablename__ = 'favorites'
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey('users.id'))

@@ -17,6 +17,9 @@ if __name__ == '__main__':
     fake = Faker()
     with app.app_context():
         print("Starting seed...")
+        User.delete_all()
+        Favorite.delete_all()
+        #FINISH DOING THIS
 
         # Create users
         users_data = []
@@ -48,21 +51,20 @@ if __name__ == '__main__':
             elif (user_birthday.month == 2 and user_birthday.day >= 19) or (user_birthday.month == 3 and user_birthday.day <= 20):
                 user_sign_id = 12  # Pisces
 
-            user_data = {
-                'name': fake.name(),
-                'username': fake.user_name(),
-                'password': fake.password(),
-                'birthday': user_birthday.strftime('%Y-%m-%d'),
-                'astrological_sign_id': user_sign_id
-            }
+            user_data = User(
+                name = fake.name(),
+                username = fake.user_name(),
+                password_hash = "1234",
+                birthday = user_birthday.strftime('%Y-%m-%d'),
+                astrological_sign_id = user_sign_id
+            )
             users_data.append(user_data)
 
 
-        for user_data in users_data:
-            user = User(**user_data)
-            db.session.add(user)
+        # for user_data in users_data:
+        #     user = User(**user_data)
+        db.session.add_all(users_data)
 
-        # Commit the users to the database before creating matches
         db.session.commit()
 
         # Create matches

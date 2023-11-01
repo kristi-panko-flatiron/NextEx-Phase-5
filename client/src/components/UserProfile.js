@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
+import axios from 'axios';
 
 const UserProfile = () => {
     const [user, setUser] = useState({});
@@ -7,10 +8,9 @@ const UserProfile = () => {
     const history = useHistory();
 
     useEffect(() => {
-        fetch('/api/userData')
-            .then(response => response.json())
-            .then(data => {
-                setUser(data);
+        axios.get('http://localhost:5555/profile')
+            .then(response => {
+                setUser(response.data);
             })
             .catch(error => {
                 console.error('Error fetching user data:', error);
@@ -22,15 +22,8 @@ const UserProfile = () => {
     };
 
     const handleSave = () => {
-        fetch(`/api/users/${user.id}`, {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(user)
-        })
-            .then(response => response.json())
-            .then(data => {
+        axios.patch('http://localhost:5555/profile', user)
+            .then(response => {
                 setEditing(false);
             })
             .catch(error => {
@@ -39,14 +32,9 @@ const UserProfile = () => {
     };
 
     const handleDelete = () => {
-        fetch(`/api/users/${user.id}`, {
-            method: 'DELETE'
-        })
-            .then(response => response.json())
-            .then(data => {
-                // Handle successful deletion
-                // You might want to redirect the user to the login page or perform any other necessary actions
-                history.push('/login'); // Redirect to the login page
+        axios.delete('http://localhost:5555/profile')
+            .then(response => {
+                history.push('/login');
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -90,6 +78,7 @@ const UserProfile = () => {
                     <p>Name: {user.name}</p>
                     <p>Username: {user.username}</p>
                     <p>Birthday: {user.birthday}</p>
+                    <p>Astrological Sign: {user.astrological_sign}</p> {/* New line added */}
                     <button onClick={handleEdit}>Edit Profile</button>
                     <button onClick={handleDelete}>Delete Account</button>
                 </div>

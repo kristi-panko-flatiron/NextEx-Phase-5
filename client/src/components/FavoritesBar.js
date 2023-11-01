@@ -1,9 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
 const FavoritesBar = () => {
     const [favorites, setFavorites] = useState([]);
-
-    // Function to remove a user from favorites
+    useEffect(() => {
+        axios.get('http://localhost:5555/favorites')
+        .then((response) => {
+            setFavorites(response.data);
+        })
+        .catch((error) => {
+        });
+    }, []);
+    // remove
     const removeFromFavorites = (user) => {
         const updatedFavorites = favorites.filter((fav) => fav.id !== user.id);
         setFavorites(updatedFavorites);

@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useHistory } from 'react-router-dom'; // Import useHistory from react-router-dom
-
+import { useHistory } from 'react-router-dom'; 
 const SignUpForm = () => {
     const [name, setName] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [birthday, setBirthday] = useState('');
-    let history = useHistory(); // Access the history object
+    let history = useHistory(); 
 
     const handleSignUp = (e) => {
         e.preventDefault();
@@ -19,12 +18,10 @@ const SignUpForm = () => {
                 birthday: birthday
             })
             .then(response => {
-                // Handle successful signup
-                console.log(response.data); // Assuming the response contains the new user data
-                history.push('/profile'); // Redirect to the profile page after successful signup
+                console.log(response.data); 
+                history.push('/profile'); 
             })
             .catch(error => {
-                // Handle signup failure
                 console.error('Error signing up', error);
             });
     };
