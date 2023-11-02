@@ -10,13 +10,15 @@ const SignUpForm = () => {
 
     const handleSignUp = (e) => {
         e.preventDefault();
-        axios
-            .post('http://localhost:5555/register', {
-                name: name,
-                username: username,
-                password: password,
-                birthday: birthday
-            })
+        
+        const userData = {
+            name: name,
+            username: username,
+            password: password,
+            birthday: birthday
+        };
+        
+        axios.post('http://localhost:5555/register', userData)
             .then(response => {
                 console.log(response.data); 
                 history.push('/profile'); 

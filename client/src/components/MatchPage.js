@@ -3,38 +3,52 @@ import axios from 'axios';
 import Card from './Card';
 import FavoritesBar from './FavoritesBar';
 
-const MatchPage = (signId) => {
+const MatchPage = () => {
     const [users, setUsers] = useState([]);
     const [favorites, setFavorites] = useState([]);
+    const userId = localStorage.getItem('userId'); 
 
     useEffect(() => {
-        axios.get(`http://localhost:5555/users_by_sign/${signId}`)
+        // Get the user's profile to find their astrological sign
+        axios.get(`http://localhost:5555/profile/${userId}`)
             .then(response => {
-                setUsers(response.data);
+                // Get the users by sign ID
+                const signId = response.data.astrological_sign_id;
+                return axios.get(`http://localhost:5555/users_by_sign/${signId}`);
+            })
+            .then(response => {
+                setUsers(response.data); 
             })
             .catch(error => {
-                console.error('Error fetching users:', error);
+                console.error('Error fetching matches:', error);
             });
-    }, [signId]);
+    }, [userId]);
 
     const handleAddToFavorites = (user) => {
-        setFavorites([...favorites, user]);
+        // Add a user to the favorites list
+        setFavorites(prevFavorites => [...prevFavorites, user]);
     };
 
     const handleRemoveFromFavorites = (user) => {
-        const updatedFavorites = favorites.filter((fav) => fav.id !== user.id);
-        setFavorites(updatedFavorites);
+        // Remove a user from the favorites list
+        setFavorites(prevFavorites => prevFavorites.filter(fav => fav.id !== user.id));
     };
 
     return (
         <div>
             <h2>Find Your Astrological Match</h2>
             {users.map((user) => (
-                <Card key={user.id} user={user} onAddToFavorites={handleAddToFavorites} />
+                <Card 
+                    key={user.id} 
+                    user={user} 
+                    onAddToFavorites={() => handleAddToFavorites(user)} 
+                />
             ))}
-            {/* Match Now Button */}
             <div>
-                <FavoritesBar favorites={favorites} removeFromFavorites={handleRemoveFromFavorites} />
+                <FavoritesBar 
+                    favorites={favorites} 
+                    removeFromFavorites={handleRemoveFromFavorites} 
+                />
             </div>
         </div>
     );

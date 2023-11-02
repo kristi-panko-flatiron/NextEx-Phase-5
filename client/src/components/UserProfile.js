@@ -8,21 +8,28 @@ const UserProfile = () => {
     const history = useHistory();
 
     useEffect(() => {
-        axios.get('http://localhost:5555/profile')
-            .then(response => {
-                setUser(response.data);
-            })
-            .catch(error => {
-                console.error('Error fetching user data:', error);
-            });
-    }, []);
+        const userId = localStorage.getItem('userId');
+        if (userId) {
+            axios.get(`http://localhost:5555/profile/${userId}`)
+                .then(response => {
+                    setUser(response.data);
+                })
+                .catch(error => {
+                    console.error('Error fetching user data:', error);
+                });
+        } else {
+            console.error('User ID not found');
+        }
+    }, [history]);
 
     const handleEdit = () => {
         setEditing(true);
     };
 
-    const handleSave = () => {
-        axios.patch('http://localhost:5555/profile', user)
+    const handleSave = (e) => {
+        e.preventDefault(); 
+        const userId = localStorage.getItem('userId');
+        axios.patch(`http://localhost:5555/profile/${userId}`, user)
             .then(response => {
                 setEditing(false);
             })
@@ -32,8 +39,10 @@ const UserProfile = () => {
     };
 
     const handleDelete = () => {
-        axios.delete('http://localhost:5555/profile')
+        const userId = localStorage.getItem('userId');
+        axios.delete(`http://localhost:5555/profile/${userId}`)
             .then(response => {
+                localStorage.removeItem('userId');
                 history.push('/login');
             })
             .catch(error => {
@@ -44,41 +53,33 @@ const UserProfile = () => {
     return (
         <div>
             {editing ? (
-                <form>
+                <form onSubmit={handleSave}>
                     <input
                         type="text"
                         placeholder="Name"
-                        value={user.name}
+                        value={user.name || ''}
                         onChange={(e) => setUser({ ...user, name: e.target.value })}
                     />
                     <input
                         type="text"
                         placeholder="Username"
-                        value={user.username}
+                        value={user.username || ''}
                         onChange={(e) => setUser({ ...user, username: e.target.value })}
-                    />
-                    <input
-                        type="password"
-                        placeholder="Password"
-                        value={user.password}
-                        onChange={(e) => setUser({ ...user, password: e.target.value })}
                     />
                     <input
                         type="date"
                         placeholder="Birthday"
-                        value={user.birthday}
+                        value={user.birthday || ''}
                         onChange={(e) => setUser({ ...user, birthday: e.target.value })}
                     />
-                    {/* Add other necessary form fields */}
-                    <button onClick={handleSave}>Save Changes</button>
-                    <button onClick={handleDelete}>Delete Account</button>
+                    <button type="submit">Save Changes</button>
                 </form>
             ) : (
                 <div>
                     <p>Name: {user.name}</p>
                     <p>Username: {user.username}</p>
                     <p>Birthday: {user.birthday}</p>
-                    <p>Astrological Sign: {user.astrological_sign}</p> {/* New line added */}
+                    <p>Astrological Sign: {user.astrological_sign?.sign_name}</p>
                     <button onClick={handleEdit}>Edit Profile</button>
                     <button onClick={handleDelete}>Delete Account</button>
                 </div>
