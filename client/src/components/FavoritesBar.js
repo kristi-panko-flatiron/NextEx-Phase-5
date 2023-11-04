@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const FavoritesBar = () => {
+const FavoritesBar = ({userId}) => {
     const [favorites, setFavorites] = useState([]);
     useEffect(() => {
         axios.get('http://localhost:5555/favorites')
@@ -11,11 +11,18 @@ const FavoritesBar = () => {
         .catch((error) => {
         });
     }, []);
-    // remove
-    const removeFromFavorites = (user) => {
-        const updatedFavorites = favorites.filter((fav) => fav.id !== user.id);
-        setFavorites(updatedFavorites);
+
+
+    const removeFromFavorites = async (user) => {
+        try {
+            await axios.delete('http://localhost:5555/favorites', { data: { user_id: userId, best_match_id: user.id } });
+            const updatedFavorites = favorites.filter((fav) => fav.id !== user.id);
+            setFavorites(updatedFavorites);
+        } catch (error) {
+            console.error('Error removing from favorites:', error);
+        }
     };
+    
 
     return (
         <div>

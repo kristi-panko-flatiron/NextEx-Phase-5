@@ -13,12 +13,6 @@ from flask import Flask, request, jsonify
 
 api = Api(app)
 
-# @app.after_request
-# def after_request(response):
-#     response.headers.add('Access-Control-Allow-Origin', '*')
-#     response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
-#     response.headers.add('Access-Control-Allow-Methods', 'GET, PATCH, POST, DELETE, OPTIONS')
-#     return response
 
 def calculate_astrological_sign(birthdate):
     if (birthdate.month == 3 and birthdate.day >= 21) or (birthdate.month == 4 and birthdate.day <= 19):
@@ -75,9 +69,10 @@ class UserLogin(Resource):
         user = User.query.filter_by(username=username).first()
         if user and user.authenticate(password):
             session['user_id'] = user.id
-            return make_response("Login successful", 200)
+            return make_response(jsonify({"user_id": user.id}), 200)
         else:
             return make_response("Invalid credentials", 401)
+        
         
 class UserRegistration(Resource):
     def post(self):
@@ -88,11 +83,24 @@ class UserRegistration(Resource):
         username = data['username']
         password = data['password']
         birthday = data['birthday']
+        
+        #bd into string object
         user_birthday = datetime.strptime(birthday, '%Y-%m-%d').date()
+        
+        #Calculate sign
         astrological_sign_id = calculate_astrological_sign(user_birthday)
-        if not all([name, username, password, birthday, astrological_sign_id]):
-            return make_response("Missing required fields", 400)
-        new_user = User(name=name, username=username, password_hash=password, birthday=birthday, astrological_sign_id=astrological_sign_id)
+        
+        # Hash password
+        password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
+        
+        new_user = User(
+            name=name, 
+            username=username, 
+            password_hash=password_hash, 
+            birthday=birthday, 
+            astrological_sign_id=astrological_sign_id
+        )
+        
         try:
             db.session.add(new_user)
             db.session.commit()
@@ -117,7 +125,6 @@ class UserManagement(Resource):
         if not user:
             return make_response(f"No user found with ID: {user_id}", 404)
         return make_response(user.to_dict(), 200)
-
 
     def patch(self, user_id):
         data = request.get_json()
@@ -188,11 +195,15 @@ class AstrologicalSignAssignment(Resource):
 
 class UsersBySign(Resource):
     def get(self, sign_id):
-        users = User.query.filter_by(astrological_sign_id=sign_id).all()
-        if not users:
-            return make_response("No users found for the specified sign ID", 404)
-        user_list = [user.to_dict() for user in users]
-        return make_response(user_list, 200)
+        best_matches = BestMatch.query.filter_by(astrological_sign_id=sign_id).all()
+        best_match_sign_ids = [match.id for match in best_matches]
+        
+        matched_users = []
+        for match_sign_id in best_match_sign_ids:
+            users = User.query.filter_by(astrological_sign_id=match_sign_id).all()
+            matched_users.extend(users)
+        return jsonify([user.to_dict() for user in matched_users])
+
 
 class Favorites(Resource):
     def get(self):
@@ -204,59 +215,66 @@ class Favorites(Resource):
 
     def post(self):
         data = request.json
-        if not data:
-            return make_response("No input data provided", 400)
-        user_id = data.get("user_id")
-        best_match_id = data.get("best_match_id")
-        if not all([user_id, best_match_id]):
-            return make_response("Missing required fields", 400)
-        user = User.query.get(user_id)
-        if not user:
-            return make_response(f"User with ID {user_id} not found", 404)
-        best_match = BestMatch.query.get(best_match_id)
-        if not best_match:
-            return make_response(f"Best match with ID {best_match_id} not found", 404)
-        user.favorites.append(best_match)
+        new_favorite = Favorite(user_id=data['user_id'], best_match_id=data['best_match_id'])
+        db.session.add(new_favorite)
         db.session.commit()
         return make_response("Favorite added successfully", 201)
 
     def delete(self):
         data = request.json
-        if not data:
-            return make_response("No input data provided", 400)
-        user_id = data.get("user_id")
-        best_match_id = data.get("best_match_id")
-        if not all([user_id, best_match_id]):
-            return make_response("Missing required fields", 400)
-        user = User.query.get(user_id)
-        if not user:
-            return make_response(f"User with ID {user_id} not found", 404)
-        best_match = BestMatch.query.get(best_match_id)
-        if not best_match:
-            return make_response(f"Best match with ID {best_match_id} not found", 404)
-        if best_match in user.favorites:
-            user.favorites.remove(best_match)
+        favorite = Favorite.query.filter_by(user_id=data['user_id'], best_match_id=data['best_match_id']).first()
+        if favorite:
+            db.session.delete(favorite)
             db.session.commit()
             return make_response("Favorite removed successfully", 200)
         else:
-            return make_response("The specified favorite does not exist for the user", 404)
+            return make_response("Favorite not found", 404)
+        
+
+
+class AllUsers(Resource):
+    def get(self):
+        all_users = User.query.all()
+        users_data = [user.to_dict() for user in all_users]
+        for user_data in users_data:
+            user_sign = AstrologicalSign.query.get(user_data['astrological_sign']['id'])
+            best_matches = BestMatch.query.filter_by(astrological_sign_id=user_sign.id).limit(2).all()
+            user_data['best_matches'] = [match.best_match_name for match in best_matches]
+        return jsonify(users_data)
+    
+class UsersByBestMatch(Resource):
+    def get(self, user_id):
+        user = User.query.get(user_id)
+        if not user:
+            return make_response("User not found", 404)
+        best_matches = BestMatch.query.filter_by(astrological_sign_id=user.astrological_sign_id).limit(2).all()
+        best_match_sign_ids = [match.id for match in best_matches]
+        matched_users = User.query.filter(User.astrological_sign_id.in_(best_match_sign_ids)).all()
+        return jsonify([user.to_dict() for user in matched_users])
 
 class BestMatches(Resource):
-    def get(self):
-        astrological_signs = AstrologicalSign.query.all()
-        all_users = User.query.all()  
-        best_matches = {}
-        for sign in astrological_signs:
-            users_for_sign = [user for user in all_users if user.astrological_sign_id == sign.id]
-            matches_data = db.session.query(BestMatch).filter_by(astrological_sign_id=sign.id).all()
-            best_match_names = [match.best_match_name for match in matches_data]
-            best_match_users = [{
-                "name": user.name,
-                "astrological_sign": map_astrological_sign_id_to_name(user.astrological_sign_id)
-            } for user in users_for_sign if user.name in best_match_names]
-            best_matches[map_astrological_sign_id_to_name(sign.id)] = best_match_users
-        return make_response(best_matches, 200)
+    def get(self, sign_id):
+        matches_data = BestMatch.query.filter_by(astrological_sign_id=sign_id).limit(2).all()
+        if not matches_data:
+            return {'message': 'No matches found'}, 404
+        return jsonify([match.astrological_sign.to_dict() for match in matches_data])
+    
 
+    # class BestMatches(Resource):
+#     def get(self):
+#         astrological_signs = AstrologicalSign.query.all()
+#         all_users = User.query.all()  
+#         best_matches = {}
+#         for sign in astrological_signs:
+#             users_for_sign = [user for user in all_users if user.astrological_sign_id == sign.id]
+#             matches_data = db.session.query(BestMatch).filter_by(astrological_sign_id=sign.id).all()
+#             best_match_names = [match.best_match_name for match in matches_data]
+#             best_match_users = [{
+#                 "name": user.name,
+#                 "astrological_sign": map_astrological_sign_id_to_name(user.astrological_sign_id)
+#             } for user in users_for_sign if user.name in best_match_names]
+#             best_matches[map_astrological_sign_id_to_name(sign.id)] = best_match_users
+#         return make_response(best_matches, 200)
 
 if __name__ == '__main__':
     api.add_resource(UserRegistration, '/register')
@@ -266,7 +284,9 @@ if __name__ == '__main__':
     api.add_resource(AstrologicalSignAssignment, '/assign_astrological_sign')
     api.add_resource(UsersBySign, '/users_by_sign/<int:sign_id>')
     api.add_resource(Favorites, '/favorites')
-    api.add_resource(BestMatches, '/bestmatches')
+    api.add_resource(BestMatches, '/bestmatches/<int:sign_id>')
+    api.add_resource(UsersByBestMatch, '/users_by_best_match/<int:user_id>')
+    api.add_resource(AllUsers, '/users')
     app.run(port=5555, debug=True)
 
 # # Remote library imports

@@ -80,6 +80,7 @@ const UserProfile = () => {
                     <p>Username: {user.username}</p>
                     <p>Birthday: {user.birthday}</p>
                     <p>Astrological Sign: {user.astrological_sign?.sign_name}</p>
+                    <p>Sign Description: {user.astrological_sign?.sign_description}</p>
                     <button onClick={handleEdit}>Edit Profile</button>
                     <button onClick={handleDelete}>Delete Account</button>
                 </div>
