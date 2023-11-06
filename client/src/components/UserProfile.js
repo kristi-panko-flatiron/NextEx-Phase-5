@@ -51,7 +51,7 @@ const UserProfile = () => {
     };
 
     return (
-        <div>
+        <div className="user-profile-container">
             {editing ? (
                 <form onSubmit={handleSave}>
                     <input

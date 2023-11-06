@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import '../index.css'
 
 const FavoritesBar = ({userId}) => {
     const [favorites, setFavorites] = useState([]);
@@ -25,19 +26,22 @@ const FavoritesBar = ({userId}) => {
     
 
     return (
-        <div>
+        <aside className="favorites-bar">
             <h3>Favorites</h3>
-            {favorites.map((favorite) => (
-                <div key={favorite.id}>
-                    {/* Display favorite user information */}
-                    <p>{favorite.name}</p>
-                    <p>{favorite.astrologicalSign}</p>
-                    {/* Add a button to remove from favorites */}
-                    <button onClick={() => removeFromFavorites(favorite)}>Remove</button>
-                </div>
-            ))}
-        </div>
+            <div className="favorite-list">
+                {favorites.map((favorite) => (
+                    <div key={favorite.id} className="favorite-item">
+                        {/* Display favorite user information */}
+                        <p>{favorite.name}</p>
+                        <p>{favorite.astrologicalSign}</p>
+                        {/* Add a button to remove from favorites */}
+                        <button onClick={() => removeFromFavorites(favorite)}>Remove</button>
+                    </div>
+                ))}
+            </div>
+        </aside>
     );
 };
+
 
 export default FavoritesBar;

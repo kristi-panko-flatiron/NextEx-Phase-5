@@ -213,22 +213,31 @@ class Favorites(Resource):
         favorite_list = [favorite.to_dict() for favorite in favorites]
         return make_response(favorite_list, 200)
 
+    # def post(self):
+    #     data = request.json
+    #     new_favorite = Favorite(user_id=data['user_id'], best_match_id=data['best_match_id'])
+    #     db.session.add(new_favorite)
+    #     db.session.commit()
+    #     return make_response("Favorite added successfully", 201)
+
     def post(self):
         data = request.json
         new_favorite = Favorite(user_id=data['user_id'], best_match_id=data['best_match_id'])
         db.session.add(new_favorite)
         db.session.commit()
-        return make_response("Favorite added successfully", 201)
+        # Return the new favorite data as well
+        return jsonify(new_favorite.to_dict()), 201
+
 
     def delete(self):
         data = request.json
         favorite = Favorite.query.filter_by(user_id=data['user_id'], best_match_id=data['best_match_id']).first()
-        if favorite:
-            db.session.delete(favorite)
-            db.session.commit()
-            return make_response("Favorite removed successfully", 200)
-        else:
+        if not favorite:
             return make_response("Favorite not found", 404)
+        
+        db.session.delete(favorite)
+        db.session.commit()
+        return make_response("Favorite removed successfully", 200)
         
 
 
@@ -259,6 +268,19 @@ class BestMatches(Resource):
             return {'message': 'No matches found'}, 404
         return jsonify([match.astrological_sign.to_dict() for match in matches_data])
     
+class BestMatchesForUser(Resource):
+    def get(self, user_id):
+        user = User.query.get(user_id)
+        if not user:
+            return {'message': 'User not found'}, 404
+
+        # Get the best matches for the user's sign
+        best_matches = BestMatch.query.filter_by(astrological_sign_id=user.astrological_sign_id).all()
+        best_match_sign_names = [match.best_match_name for match in best_matches]
+        
+        # Get all users with a sign that's in the best matches
+        matched_users = User.query.join(AstrologicalSign).filter(AstrologicalSign.sign_name.in_(best_match_sign_names)).all()
+        return jsonify([matched_user.to_dict() for matched_user in matched_users])
 
     # class BestMatches(Resource):
 #     def get(self):
@@ -287,324 +309,5 @@ if __name__ == '__main__':
     api.add_resource(BestMatches, '/bestmatches/<int:sign_id>')
     api.add_resource(UsersByBestMatch, '/users_by_best_match/<int:user_id>')
     api.add_resource(AllUsers, '/users')
+    api.add_resource(BestMatchesForUser, '/best_matches_for_user/<int:user_id>')
     app.run(port=5555, debug=True)
-
-# # Remote library imports
-# from flask import request, jsonify, make_response, session
-# from flask_restful import Resource, Api
-# from datetime import datetime, date
-
-# # Local imports
-# from config import app, db
-# from models import *
-
-# # from models import User
-
-# # Instantiate API
-# api = Api(app)
-
-# # User endpoints
-# class UserList(Resource):
-#     def get(self):
-#         from models import User
-#         return_list = [u.to_dict() for u in User.query.all()]
-#         return make_response(return_list, 200)
-
-#     def post(self):
-#         try:
-#             data = request.get_json(force=True)
-#             if not data:
-#                 return make_response(jsonify({"message": "No input data provided"}), 400)
-
-#             required_fields = ["name", "birthday", "username", "password", "astrological_sign_id"]
-#             for field in required_fields:
-#                 if field not in data:
-#                     return make_response(jsonify({"message": f"Missing required field: {field}"}), 400)
-
-#             user_hold = User(
-#                 name=data["name"],
-#                 birthday=data["birthday"],
-#                 username=data["username"],
-#                 password=data["password"],
-#                 astrological_sign_id=data["astrological_sign_id"]
-#             )
-#             db.session.add(user_hold)
-#             db.session.commit()
-#             session["user_id"] = user_hold.id
-#             return make_response(jsonify(user_hold.to_dict()), 201)
-
-#         except ValueError as e:
-#             return make_response(jsonify({"message": f"Value error: {str(e)}"}), 400)
-
-#         except Exception as e:
-#             return make_response(jsonify({"message": f"Failed to create user: {str(e)}"}), 400)
-
-
-#     # def patch(self, user_id):
-#     #     user_hold = User.query.filter_by(id=user_id).one_or_none()
-#     #     if not user_hold:
-#     #         return make_response("User not found", 404)
-#     #     try:
-#     #         data = request.get_json()
-#     #         for attr in data:
-#     #             setattr(user_hold, attr, data[attr])
-#     #         db.session.add(user_hold)
-#     #         db.session.commit()
-#     #         return make_response(user_hold.to_dict(), 202)
-#     #     except:
-#     #         return make_response("Failed to update user", 400)
-
-
-#     # def delete(self, user_id):
-#     #     user_hold = User.query.filter_by(id=user_id).one_or_none()
-#     #     if not user_hold:
-#     #         return make_response("User not found", 404)
-#     #     db.session.delete(user_hold)
-#     #     db.session.commit()
-#     #     return make_response("Successful delete", 204)
-
-# class UserByID(Resource):
-#     def get(self, id):
-#         user_hold = User.query.filter_by(id=id).one_or_none()
-#         if not user_hold:
-#             return make_response("User not found", 404)
-#         return make_response(user_hold.to_dict(), 200)
-
-#     def patch(self, id):
-#         user_hold = User.query.filter_by(id=id).one_or_none()
-#         if not user_hold:
-#             return make_response("User not found", 404)
-#         try:
-#             data = request.get_json()
-#             for attr in data:
-#                 setattr(user_hold, attr, data[attr])
-#             db.session.add(user_hold)
-#             db.session.commit()
-#             return make_response(user_hold.to_dict(), 202)
-#         except:
-#             return make_response("Failed to update user", 400)
-
-#     def delete(self, id):
-#         user_hold = User.query.filter_by(id=id).one_or_none()
-#         if not user_hold:
-#             return make_response("User not found", 404)
-#         db.session.delete(user_hold)
-#         db.session.commit()
-#         return make_response("Successful delete", 204)
-
-# class AstrologicalSignList(Resource):
-#     def get(self):
-#         return_list = [a.to_dict() for a in AstrologicalSign.query.all()]
-#         return make_response(return_list, 200)
-
-#     def post(self):
-#         data = request.get_json()
-#         try:
-#             astrological_sign_hold = AstrologicalSign(sign_name=data["sign_name"], sign_description=data["sign_description"])
-#             db.session.add(astrological_sign_hold)
-#             db.session.commit()
-#             return make_response(astrological_sign_hold.to_dict(), 201)
-#         except:
-#             return make_response("Failed to create astrological sign", 400)
-
-#     def patch(self, id):
-#         astrological_sign_hold = AstrologicalSign.query.filter_by(id=id).one_or_none()
-#         if not astrological_sign_hold:
-#             return make_response("Astrological sign not found", 404)
-#         try:
-#             data = request.get_json()
-#             for attr in data:
-#                 setattr(astrological_sign_hold, attr, data[attr])
-#             db.session.add(astrological_sign_hold)
-#             db.session.commit()
-#             return make_response(astrological_sign_hold.to_dict(), 202)
-#         except:
-#             return make_response("Failed to update astrological sign", 400)
-
-#     def delete(self, id):
-#         astrological_sign_hold = AstrologicalSign.query.filter_by(id=id).one_or_none()
-#         if not astrological_sign_hold:
-#             return make_response("Astrological sign not found", 404)
-#         db.session.delete(astrological_sign_hold)
-#         db.session.commit()
-#         return make_response("Successful delete", 204)
-
-
-# class AstrologicalSignByID(Resource):
-#     def get(self, id):
-#         astrological_sign_hold = AstrologicalSign.query.filter_by(id=id).one_or_none()
-#         if not astrological_sign_hold:
-#             return make_response("Astrological sign not found", 404)
-#         return make_response(astrological_sign_hold.to_dict(), 200)
-
-#     def patch(self, id):
-#         astrological_sign_hold = AstrologicalSign.query.filter_by(id=id).one_or_none()
-#         if not astrological_sign_hold:
-#             return make_response("Astrological sign not found", 404)
-#         try:
-#             data = request.get_json()
-#             for attr in data:
-#                 setattr(astrological_sign_hold, attr, data[attr])
-#             db.session.add(astrological_sign_hold)
-#             db.session.commit()
-#             return make_response(astrological_sign_hold.to_dict(), 202)
-#         except:
-#             return make_response("Failed to update astrological sign", 400)
-
-#     def delete(self, id):
-#         astrological_sign_hold = AstrologicalSign.query.filter_by(id=id).one_or_none()
-#         if not astrological_sign_hold:
-#             return make_response("Astrological sign not found", 404)
-#         db.session.delete(astrological_sign_hold)
-#         db.session.commit()
-#         return make_response("Successful delete", 204)
-
-# class MatchList(Resource):
-#     def get(self):
-#         return_list = [m.to_dict() for m in Match.query.all()]
-#         return make_response(return_list, 200)
-
-#     def post(self):
-#         data = request.get_json()
-#         try:
-#             match_hold = Match(match_date=data["match_date"])
-#             db.session.add(match_hold)
-#             db.session.commit()
-#             return make_response(match_hold.to_dict(), 201)
-#         except:
-#             return make_response("Failed to create match", 400)
-
-#     def patch(self, id):
-#         match_hold = Match.query.filter_by(id=id).one_or_none()
-#         if not match_hold:
-#             return make_response("Match not found", 404)
-#         try:
-#             data = request.get_json()
-#             for attr in data:
-#                 setattr(match_hold, attr, data[attr])
-#             db.session.add(match_hold)
-#             db.session.commit()
-#             return make_response(match_hold.to_dict(), 202)
-#         except:
-#             return make_response("Failed to update match", 400)
-
-#     def delete(self, id):
-#         match_hold = Match.query.filter_by(id=id).one_or_none()
-#         if not match_hold:
-#             return make_response("Match not found", 404)
-#         db.session.delete(match_hold)
-#         db.session.commit()
-#         return make_response("Successful delete", 204)
-
-# class MatchByID(Resource):
-#     def get(self, id):
-#         match_hold = Match.query.filter_by(id=id).one_or_none()
-#         if not match_hold:
-#             return make_response("Match not found", 404)
-#         return make_response(match_hold.to_dict(), 200)
-
-#     def patch(self, id):
-#         match_hold = Match.query.filter_by(id=id).one_or_none()
-#         if not match_hold:
-#             return make_response("Match not found", 404)
-#         try:
-#             data = request.get_json()
-#             for attr in data:
-#                 setattr(match_hold, attr, data[attr])
-#             db.session.add(match_hold)
-#             db.session.commit()
-#             return make_response(match_hold.to_dict(), 202)
-#         except:
-#             return make_response("Failed to update match", 400)
-
-#     def delete(self, id):
-#         match_hold = Match.query.filter_by(id=id).one_or_none()
-#         if not match_hold:
-#             return make_response("Match not found", 404)
-#         db.session.delete(match_hold)
-#         db.session.commit()
-#         return make_response("Successful delete", 204)
-
-# class BestMatchList(Resource):
-#     def get(self):
-#         return_list = [bm.to_dict() for bm in BestMatch.query.all()]
-#         return make_response(return_list, 200)
-
-#     def post(self):
-#         data = request.get_json()
-#         try:
-#             best_match_hold = BestMatch(
-#                 astrological_sign_id=data["astrological_sign_id"],
-#                 best_match_name=data["best_match_name"]
-#             )
-#             db.session.add(best_match_hold)
-#             db.session.commit()
-#             return make_response(best_match_hold.to_dict(), 201)
-#         except:
-#             return make_response("Failed to create best match", 400)
-
-#     def patch(self, id):
-#         best_match_hold = BestMatch.query.filter_by(id=id).one_or_none()
-#         if not best_match_hold:
-#             return make_response("Best match not found", 404)
-#         try:
-#             data = request.get_json()
-#             for attr in data:
-#                 setattr(best_match_hold, attr, data[attr])
-#             db.session.add(best_match_hold)
-#             db.session.commit()
-#             return make_response(best_match_hold.to_dict(), 202)
-#         except:
-#             return make_response("Failed to update best match", 400)
-
-#     def delete(self, id):
-#         best_match_hold = BestMatch.query.filter_by(id=id).one_or_none()
-#         if not best_match_hold:
-#             return make_response("Best match not found", 404)
-#         db.session.delete(best_match_hold)
-#         db.session.commit()
-#         return make_response("Successful delete", 204)
-
-
-# class BestMatchByID(Resource):
-#     def get(self, id):
-#         best_match_hold = BestMatch.query.filter_by(id=id).one_or_none()
-#         if not best_match_hold:
-#             return make_response("Best match not found", 404)
-#         return make_response(best_match_hold.to_dict(), 200)
-
-#     def patch(self, id):
-#         best_match_hold = BestMatch.query.filter_by(id=id).one_or_none()
-#         if not best_match_hold:
-#             return make_response("Best match not found", 404)
-#         try:
-#             data = request.get_json()
-#             for attr in data:
-#                 setattr(best_match_hold, attr, data[attr])
-#             db.session.add(best_match_hold)
-#             db.session.commit()
-#             return make_response(best_match_hold.to_dict(), 202)
-#         except:
-#             return make_response("Failed to update best match", 400)
-
-#     def delete(self, id):
-#         best_match_hold = BestMatch.query.filter_by(id=id).one_or_none()
-#         if not best_match_hold:
-#             return make_response("Best match not found", 404)
-#         db.session.delete(best_match_hold)
-#         db.session.commit()
-#         return make_response("Successful delete", 204)
-#     # Consolidated add_resource calls
-    # api.add_resource(UserList, "/users")
-    # api.add_resource(UserByID, "/users/<int:id>")
-    # api.add_resource(AstrologicalSignList, "/astrological_signs")
-    # api.add_resource(AstrologicalSignByID, "/astrological_signs/<int:id>")
-    # api.add_resource(MatchList, "/matches")
-    # api.add_resource(MatchByID, "/matches/<int:id>")
-    # api.add_resource(BestMatchList, "/best_matches")
-    # api.add_resource(BestMatchByID, "/best_matches/<int:id>")
-
-# if __name__ == '__main__':
-
-#     app.run(port=5555, debug=True)
-

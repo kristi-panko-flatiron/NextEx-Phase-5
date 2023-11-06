@@ -5,3 +5,212 @@
   --text: hsla(0, 0%, 100%, 0.88);
 }
 
+/* App.css */
+.app-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+}
+
+/* NavBar.css */
+.nav-bar {
+  width: 100%;
+  background-color: #333;
+  overflow: hidden;
+}
+
+.nav-links {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+}
+
+.nav-links li {
+  float: left;
+}
+
+.nav-links li a {
+  display: block;
+  color: white;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+
+.nav-links li a:hover {
+  background-color: #ddd;
+  color: black;
+}
+
+/* FavoritesBar.css */
+.favorites-bar {
+  width: 250px;
+  background-color: #f9f9f9;
+  padding: 20px;
+  box-sizing: border-box;
+  border-right: 1px solid #ccc;
+}
+
+.favorite-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.favorite-item {
+  margin-bottom: 10px;
+  padding: 10px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+/* Card.css */
+.card {
+  width: calc(25% - 20px);
+  margin-bottom: 20px;
+  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+  transition: 0.3s;
+  border-radius: 15px;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  text-align: center;
+  padding: 20px;
+  background: #fff;
+}
+
+@media (max-width: 1200px) {
+  .card {
+    width: calc(50% - 20px);
+  }
+}
+
+@media (max-width: 768px) {
+  .card {
+    width: calc(100% - 20px);
+  }
+}
+
+.card img {
+  max-width: 80%;
+  border-radius: 10px;
+}
+
+.card button {
+  margin-top: 10px;
+}
+
+.user-image {
+  max-width: 100%;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+.add-to-fav-btn {
+  padding: 5px 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.add-to-fav-btn:hover {
+  background-color: #0056b3;
+}
+
+/* MatchPage and other new styles */
+.match-page {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 20px;
+  gap: 20px;
+}
+
+.match-heading {
+  text-align: center;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.cards-container {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.card-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  gap: 20px;
+}
+
+.home-container,
+.signup-form-container,
+.user-profile-container,
+.login-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-top: 50px;
+}
+
+.form-container,
+.user-profile-container form,
+.user-profile-container div,
+.signup-form,
+.login-form {
+  width: 100%;
+  max-width: 400px;
+  margin-bottom: 20px;
+}
+
+.profile-link-container {
+  margin-top: 20px;
+}
+
+.user-profile-container input[type="text"],
+.user-profile-container input[type="date"],
+.user-profile-container button,
+.signup-form input,
+.signup-form button,
+.login-form input,
+.login-form button {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.user-profile-container button,
+.signup-form button,
+.login-form button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.signup-form h2,
+.login-form h2 {
+  margin-bottom: 20px;
+}
+
+.login-form button:hover,
+.signup-form button:hover {
+  background-color: #0056b3;
+}

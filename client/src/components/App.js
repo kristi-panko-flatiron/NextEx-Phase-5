@@ -7,10 +7,12 @@ import UserProfile from './UserProfile';
 import LoginForm from './LoginForm';
 import SignUpForm from './SignUpForm';
 import MatchPage from './MatchPage';
+import '../index.css'
 
 const App = () => {
     return (
         <Router>
+            <div className = "app-container">
             <Layout>
                 <Switch>
                     <Route exact path="/" component={HomePage} />
@@ -20,6 +22,7 @@ const App = () => {
                     <Route path="/matches" component={MatchPage} />
                 </Switch>
             </Layout>
+            </div>
         </Router>
     );
 };

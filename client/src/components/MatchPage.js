@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Card from './Card';
 import FavoritesBar from './FavoritesBar';
+import '../index.css'
 
 // const bestMatchesData = [
 //     {'astrological_sign_id': 1, 'best_match_name': 'Leo'},
@@ -67,26 +68,32 @@ const MatchPage = () => {
         fetchMatches();
     }, []);
 
-
     // useEffect(() => {
     // const fetchMatches = async () => {
     //     try {
     //         const userId = localStorage.getItem('userId');
     //         if (userId) {
-    //       // Fetch the logged-in user's astrological sign
+    //           // Fetch the logged-in user's astrological sign
     //         const profileResponse = await axios.get(`http://localhost:5555/profile/${userId}`);
     //         const userSignId = profileResponse.data.astrological_sign.id;
-    //         const userBestMatches = bestMatchesData[userSignId]; // Get the best matches for the user's sign ID
-
-    //       // Fetch all users
+            
+    //           // Fetch the best matches for the user's sign
+    //         const matchesResponse = await axios.get(`http://localhost:5555/best_matches/${userSignId}`);
+    //         const bestMatches = matchesResponse.data;
+            
+    //           // Get the IDs of the best matched signs
+    //         const bestMatchesSignIds = bestMatches.map(match => match.astrological_sign_id);
+            
+    //           // Fetch all users
     //         const usersResponse = await axios.get('http://localhost:5555/users');
-    //         const allUsers = usersResponse.data;
-
-    //       // Filter users by the best matching signs
+    //         let allUsers = usersResponse.data;
+            
+    //           // Filter users by the best matching signs
     //         const filteredUsers = allUsers.filter(user =>
-    //             userBestMatches.includes(user.astrological_sign.sign_name) // Ensure this matches the property in your users data
+    //             bestMatchesSignIds.includes(user.astrological_sign_id)
     //         );
-
+            
+    //           // Update state with filtered users
     //         setUsers(filteredUsers);
     //         }
     //     } catch (error) {
@@ -94,8 +101,9 @@ const MatchPage = () => {
     //     }
     //     };
 
+    //     // Call fetchMatches when the component mounts
     //     fetchMatches();
-    // }, []);
+    //   }, []); // Empty dependency array means this effect runs once on mount
 
 
     const handleAddToFavorites = async (user) => { 
@@ -116,21 +124,23 @@ const MatchPage = () => {
     };
 
     return (
-        <div>
-            <h2>Find Your Astrological Match</h2>
-            {users.map((user) => (
-                <Card 
-                    key={user.id} 
-                    user={user} 
-                    onAddToFavorites={() => handleAddToFavorites(user)} 
-                />
-            ))}
-            <div>
-                <FavoritesBar 
-                    favorites={favorites} 
-                    removeFromFavorites={handleRemoveFromFavorites}
-                    userId={userId} 
-                />
+        <div className="match-page">
+            <FavoritesBar 
+                favorites={favorites} 
+                removeFromFavorites={handleRemoveFromFavorites}
+                userId={userId} 
+            />
+            <div className="cards-container">
+                <h2 className="match-heading">Find Your Astrological Match</h2>
+                <div className="card-grid">
+                    {users.map((user) => (
+                        <Card 
+                            key={user.id} 
+                            user={user} 
+                            onAddToFavorites={() => handleAddToFavorites(user)} 
+                        />
+                    ))}
+                </div>
             </div>
         </div>
     );

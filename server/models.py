@@ -123,9 +123,10 @@ class BestMatch(db.Model):
 
     def to_dict(self):
         return {
-        'id': self.id,
-        'astrological_sign': self.astrological_sign,
-        'best_match_name': self.best_match_name
+            'id': self.id,
+            'astrological_sign_id': self.astrological_sign_id,
+            'best_match_name': self.best_match_name,
+            'astrological_sign': self.astrological_sign.to_dict() if self.astrological_sign else None
         }
 
 class Favorite(db.Model):
@@ -141,6 +142,15 @@ class Favorite(db.Model):
             'id': self.id,
             'user_id': self.user_id,
             'best_match_id': self.best_match_id
+        }
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'best_match_id': self.best_match_id,
+            # 'best_match_name': self.best_match.name, 
+            # 'astrological_sign': self.best_match.astrological_sign.sign_name
         }
 
     serialize_rules = ('-user.favorites', '-best_match.favorites',)
