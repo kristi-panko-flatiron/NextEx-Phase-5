@@ -204,14 +204,13 @@ class UsersBySign(Resource):
             matched_users.extend(users)
         return jsonify([user.to_dict() for user in matched_users])
 
-
 class Favorites(Resource):
-    def get(self):
-        favorites = Favorite.query.all()
-        if not favorites:
-            return make_response("No favorites found", 404)
-        favorite_list = [favorite.to_dict() for favorite in favorites]
-        return make_response(favorite_list, 200)
+#     def get(self):
+#         favorites = Favorite.query.all()
+#         if not favorites:
+#             return make_response("No favorites found", 404)
+#         favorite_list = [favorite.to_dict() for favorite in favorites]
+#         return make_response(favorite_list, 200)
 
     # def post(self):
     #     data = request.json
@@ -222,16 +221,15 @@ class Favorites(Resource):
 
     def post(self):
         data = request.json
-        new_favorite = Favorite(user_id=data['user_id'], best_match_id=data['best_match_id'])
+        new_favorite = favorite(user_id=data['user_id'], best_match_id=data['best_match_id'])
         db.session.add(new_favorite)
         db.session.commit()
-        # Return the new favorite data as well
         return jsonify(new_favorite.to_dict()), 201
 
 
     def delete(self):
         data = request.json
-        favorite = Favorite.query.filter_by(user_id=data['user_id'], best_match_id=data['best_match_id']).first()
+        favorite = favorite.query.filter_by(user_id=data['user_id'], best_match_id=data['best_match_id']).first()
         if not favorite:
             return make_response("Favorite not found", 404)
         
@@ -239,7 +237,6 @@ class Favorites(Resource):
         db.session.commit()
         return make_response("Favorite removed successfully", 200)
         
-
 
 class AllUsers(Resource):
     def get(self):
@@ -251,22 +248,25 @@ class AllUsers(Resource):
             user_data['best_matches'] = [match.best_match_name for match in best_matches]
         return jsonify(users_data)
     
+
 class UsersByBestMatch(Resource):
     def get(self, user_id):
         user = User.query.get(user_id)
         if not user:
             return make_response("User not found", 404)
-        best_matches = BestMatch.query.filter_by(astrological_sign_id=user.astrological_sign_id).limit(2).all()
-        best_match_sign_ids = [match.id for match in best_matches]
+        best_matches = BestMatch.query.filter_by(astrological_sign_id=user.astrological_sign_id).all()
+        best_match_sign_ids = [AstrologicalSign.query.filter_by(sign_name=match.best_match_name).first().id for match in best_matches]
         matched_users = User.query.filter(User.astrological_sign_id.in_(best_match_sign_ids)).all()
         return jsonify([user.to_dict() for user in matched_users])
+    
 
 class BestMatches(Resource):
     def get(self, sign_id):
-        matches_data = BestMatch.query.filter_by(astrological_sign_id=sign_id).limit(2).all()
-        if not matches_data:
+        best_matches = BestMatch.query.filter_by(astrological_sign_id=sign_id).all()
+        if not best_matches:
             return {'message': 'No matches found'}, 404
-        return jsonify([match.astrological_sign.to_dict() for match in matches_data])
+        return jsonify([match.to_dict() for match in best_matches])
+
     
 class BestMatchesForUser(Resource):
     def get(self, user_id):
@@ -282,21 +282,6 @@ class BestMatchesForUser(Resource):
         matched_users = User.query.join(AstrologicalSign).filter(AstrologicalSign.sign_name.in_(best_match_sign_names)).all()
         return jsonify([matched_user.to_dict() for matched_user in matched_users])
 
-    # class BestMatches(Resource):
-#     def get(self):
-#         astrological_signs = AstrologicalSign.query.all()
-#         all_users = User.query.all()  
-#         best_matches = {}
-#         for sign in astrological_signs:
-#             users_for_sign = [user for user in all_users if user.astrological_sign_id == sign.id]
-#             matches_data = db.session.query(BestMatch).filter_by(astrological_sign_id=sign.id).all()
-#             best_match_names = [match.best_match_name for match in matches_data]
-#             best_match_users = [{
-#                 "name": user.name,
-#                 "astrological_sign": map_astrological_sign_id_to_name(user.astrological_sign_id)
-#             } for user in users_for_sign if user.name in best_match_names]
-#             best_matches[map_astrological_sign_id_to_name(sign.id)] = best_match_users
-#         return make_response(best_matches, 200)
 
 if __name__ == '__main__':
     api.add_resource(UserRegistration, '/register')

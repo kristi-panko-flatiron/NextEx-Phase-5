@@ -4,69 +4,11 @@ import Card from './Card';
 import FavoritesBar from './FavoritesBar';
 import '../index.css'
 
-// const bestMatchesData = [
-//     {'astrological_sign_id': 1, 'best_match_name': 'Leo'},
-//     {'astrological_sign_id': 1, 'best_match_name': 'Sagittarius'},
-//     {'astrological_sign_id': 2, 'best_match_name': 'Virgo'},
-//     {'astrological_sign_id': 2, 'best_match_name': 'Capricorn'},
-//     {'astrological_sign_id': 3, 'best_match_name': 'Libra'},
-//     {'astrological_sign_id': 3, 'best_match_name': 'Aquarius'},
-//     {'astrological_sign_id': 4, 'best_match_name': 'Scorpio'},
-//     {'astrological_sign_id': 4, 'best_match_name': 'Pisces'},
-//     {'astrological_sign_id': 5, 'best_match_name': 'Aries'},
-//     {'astrological_sign_id': 5, 'best_match_name': 'Sagittarius'},
-//     {'astrological_sign_id': 6, 'best_match_name': 'Taurus'},
-//     {'astrological_sign_id': 6, 'best_match_name': 'Capricorn'},
-//     {'astrological_sign_id': 7, 'best_match_name': 'Gemini'},
-//     {'astrological_sign_id': 7, 'best_match_name': 'Aquarius'},
-//     {'astrological_sign_id': 8, 'best_match_name': 'Cancer'},
-//     {'astrological_sign_id': 8, 'best_match_name': 'Pisces'},
-//     {'astrological_sign_id': 9, 'best_match_name': 'Aries'},
-//     {'astrological_sign_id': 9, 'best_match_name': 'Leo'},
-//     {'astrological_sign_id': 10, 'best_match_name': 'Scorpio'},
-//     {'astrological_sign_id': 10, 'best_match_name': 'Pisces'},
-//     {'astrological_sign_id': 11, 'best_match_name': 'Gemini'},
-//     {'astrological_sign_id': 11, 'best_match_name': 'Libra'},
-//     {'astrological_sign_id': 12, 'best_match_name': 'Cancer'},
-//     {'astrological_sign_id': 12, 'best_match_name': 'Scorpio'}
-// ]
-
 const MatchPage = () => {
     const [users, setUsers] = useState([]);
     const [favorites, setFavorites] = useState([]);
     const userId = localStorage.getItem('userId'); 
     // const [matches, setMatches] = useState([]);
-
-    useEffect(() => {
-    const fetchMatches = async () => {
-        try {
-            const userId = localStorage.getItem('userId');
-            if (userId) {
-              // Fetch the logged-in user's astrological sign
-            const profileResponse = await axios.get(`http://localhost:5555/profile/${userId}`);
-            const userSignId = profileResponse.data.astrological_sign.id;
-            
-              // Fetch the best matches for the user's sign
-            const matchesResponse = await axios.get(`http://localhost:5555/bestmatches/${userSignId}`);
-            const bestMatchesSignIds = matchesResponse.data.map(match => match.astrological_sign_id);
-            
-              // Fetch all users
-            const usersResponse = await axios.get('http://localhost:5555/users');
-            
-              // Filter users by the best matching signs
-            const filteredUsers = usersResponse.data.filter(user => 
-                bestMatchesSignIds.includes(user.astrological_sign_id)
-            );
-            
-            setUsers(filteredUsers);
-            }
-        } catch (error) {
-            console.error('Error fetching matches:', error);
-        }
-        };
-        
-        fetchMatches();
-    }, []);
 
     // useEffect(() => {
     // const fetchMatches = async () => {
@@ -78,32 +20,122 @@ const MatchPage = () => {
     //         const userSignId = profileResponse.data.astrological_sign.id;
             
     //           // Fetch the best matches for the user's sign
-    //         const matchesResponse = await axios.get(`http://localhost:5555/best_matches/${userSignId}`);
-    //         const bestMatches = matchesResponse.data;
-            
-    //           // Get the IDs of the best matched signs
-    //         const bestMatchesSignIds = bestMatches.map(match => match.astrological_sign_id);
+    //         const matchesResponse = await axios.get(`http://localhost:5555/bestmatches/${userSignId}`);
+    //         const bestMatchesSignIds = matchesResponse.data.map(match => match.astrological_sign_id);
             
     //           // Fetch all users
     //         const usersResponse = await axios.get('http://localhost:5555/users');
-    //         let allUsers = usersResponse.data;
             
     //           // Filter users by the best matching signs
-    //         const filteredUsers = allUsers.filter(user =>
+    //         const filteredUsers = usersResponse.data.filter(user => 
     //             bestMatchesSignIds.includes(user.astrological_sign_id)
     //         );
             
-    //           // Update state with filtered users
     //         setUsers(filteredUsers);
     //         }
     //     } catch (error) {
     //         console.error('Error fetching matches:', error);
     //     }
     //     };
-
-    //     // Call fetchMatches when the component mounts
+        
     //     fetchMatches();
-    //   }, []); // Empty dependency array means this effect runs once on mount
+    // }, []);
+
+    // useEffect(() => {
+    //     const fetchMatches = async () => {
+    //         try {
+    //             const userId = localStorage.getItem('userId');
+    //             if (userId) {
+    //                 // Fetch the logged-in user's astrological sign
+    //                 const profileResponse = await axios.get(`http://localhost:5555/profile/${userId}`);
+    //                 const userSignId = profileResponse.data.astrological_sign.id;
+                    
+    //                 // Fetch the best matches for the user's sign
+    //                 const matchesResponse = await axios.get(`http://localhost:5555/bestmatches/${userSignId}`);
+    //                 const bestMatchesSignIds = matchesResponse.data.map(match => match.astrological_sign_id);
+                    
+    //                 // Fetch all users with a sign that's in the best matches
+    //                 const usersResponse = await axios.get('http://localhost:5555/users');
+    //                 const filteredUsers = usersResponse.data.filter(user => 
+    //                     bestMatchesSignIds.includes(user.astrological_sign_id)
+    //                 );
+                    
+    //                 setUsers(filteredUsers);
+    //             }
+    //         } catch (error) {
+    //             console.error('Error fetching matches:', error);
+    //         }
+    //     };
+        
+    //     fetchMatches();
+    // }, []);
+    // useEffect(() => {
+    //     const fetchMatches = async () => {
+    //         try {
+    //             const userId = localStorage.getItem('userId');
+    //             if (userId) {
+    //                 // Fetch the best matches for the user's sign
+    //                 const response = await axios.get(`http://localhost:5555/users_by_best_match/${userId}`);
+    //                 setUsers(response.data); // Assumes the API returns an array of user objects
+    //             }
+    //         } catch (error) {
+    //             console.error('Error fetching matches:', error);
+    //         }
+    //     };
+        
+    //     fetchMatches();
+    // }, []);
+    
+    // useEffect(() => {
+    //     const fetchMatches = async () => {
+    //         try {
+    //             const userId = localStorage.getItem('userId');
+    //             if (userId) {
+    //                 const profileResponse = await axios.get(`http://localhost:5555/profile/${userId}`);
+    //                 if (profileResponse.status === 200 && profileResponse.data.astrological_sign) {
+    //                     const userSignId = profileResponse.data.astrological_sign.id;
+    //                     const bestMatchesResponse = await axios.get(`http://localhost:5555/bestmatches/${userSignId}`);
+    //                     if (bestMatchesResponse.status === 200) {
+    //                         const bestMatchSignIds = bestMatchesResponse.data.map(match => match.astrological_sign_id);
+    //                         console.log(bestMatchSignIds)
+    //                         const usersResponse = await axios.get('http://localhost:5555/users');
+    //                         if (usersResponse.status === 200) {
+    //                             const filteredUsers = usersResponse.data.filter(user =>
+    //                                 bestMatchSignIds.includes(user.astrological_sign_id)
+    //                             );
+    //                             console.log(filteredUsers) 
+    //                             setUsers(filteredUsers);
+    //                         }
+    //                     }
+    //                 }
+    //             }
+    //         } catch (error) {
+    //             console.error('Error fetching matches:', error);
+    //         }
+    //     };
+    
+    //     fetchMatches();
+    // }, []);
+    useEffect(() => {
+        const fetchMatches = async () => {
+            try {
+                const userId = localStorage.getItem('userId');
+                if (userId) {
+                    const response = await axios.get(`http://localhost:5555/users_by_best_match/${userId}`);
+                    if (response.status === 200) {
+                        setUsers(response.data); 
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching matches:', error);
+            }
+        };
+    
+        fetchMatches();
+    }, []);
+    
+    
+
 
 
     const handleAddToFavorites = async (user) => { 

@@ -4,6 +4,11 @@ from datetime import datetime
 from sqlalchemy.ext.hybrid import hybrid_property
 from config import db, bcrypt
 
+favorite = db.Table(
+    'favorite',
+    db.Column('user_id', db.Integer, db.ForeignKey('users.id')),
+    db.Column('fav_user_id', db.Integer, db.ForeignKey('users.id'))
+)
 
 class User(db.Model):
     __tablename__ = 'users'
@@ -13,9 +18,13 @@ class User(db.Model):
     username = Column(String(50), nullable=False)
     _password_hash = Column(String, nullable=False)
     astrological_sign_id = Column(Integer, ForeignKey('astrological_signs.id'))
-    matches = relationship("UserMatch", back_populates="user")
-    favorites = relationship("Favorite", back_populates="user")
-    serialize_rules = ('-user_matches.user',)
+
+    favorites = db.relationship('User', 
+                                secondary = favorite, 
+                                primaryjoin = (favorite.c.user_id == id),
+                                secondaryjoin = (favorite.c.fav_user_id == id),
+                                backref = 'matches'
+                                )
 
     @hybrid_property
     def password_hash ( self ) :
@@ -38,7 +47,6 @@ class User(db.Model):
             'name': self.name,
             'birthday': self.birthday,
             'username': self.username,
-            # 'password': self.password,
             'astrological_sign': self.astrological_sign.to_dict()
         }
 
@@ -53,12 +61,6 @@ class User(db.Model):
         if not username:
             raise ValueError("Username must be provided.")
         return username
-
-    # @validates('password')
-    # def validate_password(self, key, password):
-    #     if not password:
-    #         raise ValueError("Password must be provided.")
-    #     return password
 
     @validates('astrological_sign_id')
     def validate_astrological_sign_id(self, key, astrological_sign_id):
@@ -80,7 +82,6 @@ class User(db.Model):
         except ValueError:
             raise ValueError("Invalid date format. Please use 'YYYY-MM-DD'.")
 
-
 class AstrologicalSign(db.Model):
     __tablename__ = 'astrological_signs'
     id = Column(Integer, primary_key=True)
@@ -97,28 +98,12 @@ class AstrologicalSign(db.Model):
             'sign_description': self.sign_description
         }
 
-class UserMatch(db.Model):
-    __tablename__ = 'user_matches'
-    user_id = Column(Integer, ForeignKey('users.id'), primary_key=True)
-    match_id = Column(Integer, ForeignKey('matches.id'), primary_key=True)
-    user = relationship("User", back_populates="matches")
-    match = relationship("Match", back_populates="users")
-    serialize_rules = ('-user.matches', '-match.users',)
-
-class Match(db.Model):
-    __tablename__ = 'matches'
-    id = Column(Integer, primary_key=True)
-    match_date = Column(Date, nullable=True)
-    users = relationship("UserMatch", back_populates="match")
-    serialize_rules = ('-users.match',)
-
 class BestMatch(db.Model):
     __tablename__ = 'best_matches'
     id = Column(Integer, primary_key=True)
     astrological_sign_id = Column(Integer, ForeignKey('astrological_signs.id'))
     best_match_name = Column(String(20), nullable=False)
     astrological_sign = relationship("AstrologicalSign", back_populates="best_matches")
-    favorites = relationship("Favorite", back_populates="best_match")
     serialize_rules = ('-favorites.best_match',)
 
     def to_dict(self):
@@ -126,31 +111,5 @@ class BestMatch(db.Model):
             'id': self.id,
             'astrological_sign_id': self.astrological_sign_id,
             'best_match_name': self.best_match_name,
-            'astrological_sign': self.astrological_sign.to_dict() if self.astrological_sign else None
         }
 
-class Favorite(db.Model):
-    __tablename__ = 'favorites'
-    id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey('users.id'))
-    best_match_id = Column(Integer, ForeignKey('best_matches.id'))
-    user = relationship("User", back_populates="favorites")
-    best_match = relationship("BestMatch", back_populates="favorites")
-
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'user_id': self.user_id,
-            'best_match_id': self.best_match_id
-        }
-    
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'user_id': self.user_id,
-            'best_match_id': self.best_match_id,
-            # 'best_match_name': self.best_match.name, 
-            # 'astrological_sign': self.best_match.astrological_sign.sign_name
-        }
-
-    serialize_rules = ('-user.favorites', '-best_match.favorites',)

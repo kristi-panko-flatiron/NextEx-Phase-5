@@ -9,7 +9,7 @@ from faker import Faker
 # Local imports
 from app import app
 from models import db
-from app import db, User, AstrologicalSign, Match, BestMatch, UserMatch
+from app import db, User, AstrologicalSign, BestMatch
 from datetime import datetime
 from datetime import date
 
@@ -17,12 +17,12 @@ if __name__ == '__main__':
     fake = Faker()
     with app.app_context():
         print("Starting seed...")
-        User.delete_all()
-        #FINISH DOING THIS
+        User.query.delete()
+        # #FINISH DOING THIS
 
         # Create users
         users_data = []
-        for _ in range(5):
+        for _ in range(40):
             user_birthday = fake.date_of_birth(minimum_age=18, maximum_age=99)
             user_sign_id = None
             if (user_birthday.month == 3 and user_birthday.day >= 21) or (user_birthday.month == 4 and user_birthday.day <= 19):
@@ -66,41 +66,42 @@ if __name__ == '__main__':
 
         db.session.commit()
 
-        # Create matches
-        matches_data = [
-            {'match_date': date.fromisoformat('2023-10-24')},
-            {'match_date': date.fromisoformat('2023-10-22')},
-            # Add more matches...
-        ]
 
-        for match_data in matches_data:
-            match = Match(**match_data)
-            db.session.add(match)
+        # # Create matches
+        # matches_data = [
+        #     {'match_date': date.fromisoformat('2023-10-24')},
+        #     {'match_date': date.fromisoformat('2023-10-22')},
+        #     # Add more matches...
+        # ]
 
-        # Commit the matches to the database before creating user matches
-        db.session.commit()
+        # for match_data in matches_data:
+        #     match = Match(**match_data)
+        #     db.session.add(match)
 
-        # Create user matches
-        user_matches_data = []
-        for i in range(5):
-            user_match_data = {
-                'user_id': i + 1,
-                'match_id': i + 1
-            }
-            user_matches_data.append(user_match_data)
+        # # Commit the matches to the database before creating user matches
+        # db.session.commit()
+
+        # # Create user matches
+        # user_matches_data = []
+        # for i in range(5):
+        #     user_match_data = {
+        #         'user_id': i + 1,
+        #         'match_id': i + 1
+        #     }
+        #     user_matches_data.append(user_match_data)
 
         # for user_match_data in user_matches_data:
         #     user_match = UserMatch(**user_match_data)
         #     db.session.add(user_match)
 
-        for user_match_data in user_matches_data:
-            existing_user_match = UserMatch.query.filter_by(
-            user_id=user_match_data['user_id'], match_id=user_match_data['match_id']).first()
-        if existing_user_match is None:
-            user_match = UserMatch(**user_match_data)
-            db.session.add(user_match)
-        else:
-            print(f"Skipping duplicate entry: {user_match_data}")
+        # for user_match_data in user_matches_data:
+        #     existing_user_match = UserMatch.query.filter_by(
+        #     user_id=user_match_data['user_id'], match_id=user_match_data['match_id']).first()
+        # if existing_user_match is None:
+        #     user_match = UserMatch(**user_match_data)
+        #     db.session.add(user_match)
+        # else:
+        #     print(f"Skipping duplicate entry: {user_match_data}")
 
         # Create astrological signs
         signs_data = [
@@ -150,11 +151,26 @@ if __name__ == '__main__':
             {'astrological_sign_id': 12, 'best_match_name': 'Scorpio'}
         ]
 
-        for best_match_data in best_matches_data:
-            best_match = BestMatch(**best_match_data)
-            db.session.add(best_match)
+        # Add best matches to the session
+        for match_data in best_matches_data:
+            match = BestMatch(**match_data)
+            db.session.add(match)
 
-        # Commit the session to the database
+        # Commit all best matches to the database
+        db.session.commit()
+
+        user1 = User.query.get(1)
+        user2 = User.query.get(2)  
+        user3 = User.query.get(3)
+        user4 = User.query.get(4)
+        user5 = User.query.get(5)
+        user6 = User.query.get(6)
+        user1.favorites.append(user2)
+        user2.favorites.append(user3)
+        user4.favorites.append(user1)
+        user5.favorites.append(user6)
+        user6.favorites.append(user1)
+
         db.session.commit()
 
         print("Seed data added successfully.")
