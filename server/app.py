@@ -325,6 +325,14 @@ class BestMatchesForUser(Resource):
         matched_users = User.query.join(AstrologicalSign).filter(AstrologicalSign.sign_name.in_(best_match_sign_names)).all()
         return jsonify([matched_user.to_dict() for matched_user in matched_users])
 
+class UserDetail(Resource):
+    def get(self, user_id):
+        user = User.query.get(user_id)
+        if user:
+            return make_response(jsonify(user.to_dict()), 200)
+        else:
+            return {'message': 'User not found'}, 404
+        
 if __name__ == '__main__':
     api.add_resource(UserRegistration, '/register')
     api.add_resource(UserLogin, '/login')
@@ -337,4 +345,5 @@ if __name__ == '__main__':
     api.add_resource(UsersByBestMatch, '/users_by_best_match/<int:user_id>')
     api.add_resource(AllUsers, '/users')
     api.add_resource(BestMatchesForUser, '/best_matches_for_user/<int:user_id>')
+    api.add_resource(UserDetail, '/user/<int:user_id>')
     app.run(port=5555, debug=True)
