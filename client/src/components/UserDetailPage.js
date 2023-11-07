@@ -4,6 +4,8 @@ import axios from 'axios';
 import '../index.css'; 
 import { Link } from 'react-router-dom';
 
+const placeholderImage = 'https://www.rd.com/wp-content/uploads/2021/04/GettyImages-514622028-e1617288074638.jpg'; // URL for the placeholder image
+
 const UserDetail = () => {
     const { userId } = useParams();
     const [user, setUser] = useState(null);
@@ -33,9 +35,11 @@ const UserDetail = () => {
         return <div>User not found.</div>;
     }
 
+    const userImage = user.image_url || placeholderImage;
+
     return (
         <div className="user-detail-container">
-            <img src={user.image_url} alt={user.name} className="user-detail-image" />
+            <img src={userImage} alt={user.name} className="user-detail-image" />
             <h1>{user.name}</h1>
             <p>Astrological Sign: {user.astrological_sign.sign_name}</p>
             <p>Sign Description: {user.astrological_sign.sign_description}</p>
