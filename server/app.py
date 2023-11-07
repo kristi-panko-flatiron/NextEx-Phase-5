@@ -87,7 +87,6 @@ class UserRegistration(Resource):
         
         #bd into string object
         user_birthday = datetime.strptime(birthday, '%Y-%m-%d').date()
-        
         #Calculate sign
         astrological_sign_id = calculate_astrological_sign(user_birthday)
         
@@ -101,7 +100,6 @@ class UserRegistration(Resource):
             birthday=birthday, 
             astrological_sign_id=astrological_sign_id
         )
-        
         try:
             db.session.add(new_user)
             db.session.commit()

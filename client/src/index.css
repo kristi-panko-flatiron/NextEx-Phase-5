@@ -1,8 +1,8 @@
 :root {
-  --bg: #F8F7FC; /* Light purple background */
-  --header: #5D5474; /* Darker purple for headers/text */
-  --link: #7C73E6; /* Bright purple for links */
-  --text: #5D5474; /* Darker purple for general text */
+  --bg: #F8F7FC;
+  --header: #5D5474;
+  --link: #7C73E6;
+  --text: #5D5474; 
 }
 
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;700&display=swap');
@@ -250,26 +250,26 @@ button:active {
 }
 
 .card img {
-  width: 100%; /* Set the width to fill the container */
-  height: 200px; /* Fixed height for all images */
-  object-fit: cover; /* Ensures the image covers the area without stretching */
-  object-position: center; /* Centers the image within the card */
-  border-radius: 10px; /* Optional: Adds rounded corners to the images */
+  width: 100%; 
+  height: 200px; 
+  object-fit: cover; 
+  object-position: center; 
+  border-radius: 10px; 
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .card:hover {
-  transform: translateY(-5px); /* Move the card up slightly */
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); /* Increase the box-shadow to give a "pop" effect */
+  transform: translateY(-5px); 
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
 }
 
 .favorite-image {
-  width: 50px; /* Set a fixed width */
-  height: 50px; /* Set a fixed height to make it square */
-  object-fit: cover; /* Ensures the image covers the area without stretching */
-  object-position: center; /* Centers the image within the frame */
-  border-radius: 50%; /* Optional: to make the image round */
-  margin-right: 10px; /* Adds some space between the image and the text */
+  width: 50px;
+  height: 50px;
+  object-fit: cover; 
+  object-position: center; 
+  border-radius: 50%;
+  margin-right: 10px; 
 }
 
 .nav-button-link {
@@ -290,8 +290,8 @@ button:active {
 }
 
 .favorite-item:hover {
-  transform: scale(1.05); /* Slightly scale up the favorite item */
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); /* Increase the box-shadow to give a "pop" effect */
+  transform: scale(1.05);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
 }
 
 .user-detail-container {
@@ -300,25 +300,25 @@ button:active {
   align-items: center;
   justify-content: center;
   text-align: center;
-  margin-top: 50px; /* Adjust as needed */
+  margin-top: 50px;
 }
 
 .user-detail-image {
-  max-width: 100%; /* Ensures image is responsive and doesn't overflow its container */
-  max-height: 400px; /* Adjust as needed for a decent size */
-  width: auto; /* Maintain aspect ratio */
-  height: auto; /* Maintain aspect ratio */
-  margin-bottom: 20px; /* Space below the image */
-  border-radius: 10px; /* Optional: if you want rounded corners */
+  max-width: 100%; 
+  max-height: 400px;
+  width: auto; 
+  height: auto; 
+  margin-bottom: 20px; 
+  border-radius: 10px; 
 }
 
 .user-detail-container h1 {
-  font-size: 2.5rem; /* Adjust the size as needed */
+  font-size: 2.5rem; 
   margin-bottom: 0.5rem;
 }
 
 .user-detail-container p {
-  font-size: 1.5rem; /* Adjust the size as needed */
+  font-size: 1.5rem; 
   margin-bottom: 0.25rem;
 }
 
@@ -326,7 +326,7 @@ button:active {
   display: inline-block;
   margin-top: 20px;
   padding: 10px 20px;
-  background-color: var(--link); /* Bright purple for the button background */
+  background-color: var(--link); 
   color: white;
   text-decoration: none;
   border-radius: 5px;
@@ -334,7 +334,7 @@ button:active {
 }
 
 .back-to-matches:hover {
-  background-color: var(--header); /* Darker purple for the hover state */
+  background-color: var(--header); 
 }
 
 .home-container {
@@ -343,19 +343,32 @@ button:active {
   align-items: center;
   text-align: center;
   margin-top: 50px;
-  color: var(--header); /* Use the dark purple for text */
+  color: var(--header); 
+  background-image: url('https://www.pixelstalk.net/wp-content/uploads/2016/10/Astrology-Wallpaper-Free-Download.jpg');
+  background-size: cover;
+  background-position: center;
+  
 }
 
 .home-container h1 {
-  font-size: 3rem; /* Large font size for the main heading */
+  font-size: 7rem; 
   margin-bottom: 1rem;
-  color: var(--link); /* Use the bright purple for headings */
+  color: #2a1c4f;
 }
 
-.home-container p {
-  font-size: 1.25rem; /* Slightly larger font size for the paragraph */
-  margin-bottom: 2rem; /* Space below the paragraph */
+.home-container h2 {
+  font-size: 2rem; 
+  margin-bottom: 2rem; 
+  color: white;
+  text-shadow:
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000; 
+  font-size: 2rem; 
 }
+
+
 
 .form-container {
   width: 100%;
@@ -404,9 +417,24 @@ button:active {
 }
 
 
-.matches-title,
-.app-title {
 
+.app-title {
+  color: rgb(233, 154, 233);
+  text-shadow:
+  -1px -1px 0 #fff,
+  1px -1px 0 #fff,
+  -1px  1px 0 #fff,
+  1px  1px 0 #fff,
+  -2px  0  0 #000,
+  2px  0  0 #000,
+  0  -2px 0 #000,
+  0   2px 0 #000,
+  -2px -2px 0 #000,
+  -2px  2px 0 #000,
+  2px -2px 0 #000,
+  2px  2px 0 #000;
+  font-size: 7rem; 
+  margin-bottom: 1rem; 
 }
 
 input[type="text"], input[type="date"], input[type="password"], textarea {
@@ -471,3 +499,22 @@ a {
 a:hover {
   color: var(--header);
 }
+
+.login-link-container {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: var(--link); /* Bright purple for links */
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+  font-size: 1rem; /* Adjust as needed */
+  text-align: center;
+  margin-top: 20px; /* Adjust as needed */
+  cursor: pointer; /* Change cursor to pointer to indicate it's clickable */
+}
+
+.login-link-container:hover {
+  background-color: var(--header); /* Darker purple on hover */
+}
+
