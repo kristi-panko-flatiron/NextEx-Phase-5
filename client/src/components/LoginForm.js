@@ -23,7 +23,8 @@ const LoginForm = () => {
 
     return (
         <div className="login-container">
-            <h2>Log in to your account</h2>
+            <h1 className="gradient-text">Login</h1>
+            <h2>Log in to your account and start matching!</h2>
             <form onSubmit={handleLogin} className="login-form">
                 <div>
                     <input

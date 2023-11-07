@@ -378,3 +378,34 @@
 .app-title {
 
 }
+
+/* UserProfile.css */
+.user-profile-container {
+  /* ... existing styles ... */
+}
+
+.profile-title {
+  font-size: 3rem; /* Increased size for the profile title */
+  margin-bottom: 1rem; /* Adjust as needed */
+}
+
+.profile-image {
+  width: 150px; /* Or your preferred size */
+  height: 150px; /* Maintain aspect ratio for the image */
+  border-radius: 50%; /* Makes the image round */
+  margin-bottom: 1rem; /* Space below the image */
+  object-fit: cover; /* Ensure the image covers the area */
+  border: 3px solid var(--link); /* Optional: Border color from your scheme */
+}
+
+/* Increase the font size for the user details */
+.user-profile-container p {
+  font-size: 1.25rem; /* Larger font size for better readability */
+  margin-bottom: 0.5rem; /* Adjust spacing as needed */
+}
+
+.user-profile-container button {
+  /* ... existing styles ... */
+  padding: 10px 20px; /* Larger padding for a more clickable area */
+  font-size: 1rem; /* Adjust button text size as needed */
+}

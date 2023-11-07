@@ -6,7 +6,7 @@ import '../index.css'
 const FavoritesBar = ({ favorites, removeFromFavorites }) => {
     return (
         <aside className="favorites-bar">
-            <h3>Favorites</h3>
+            <h3 className="gradient-text">Favorites</h3>
             <div className="favorite-list">
                 {favorites.map((favorite) => (
                     <div key={favorite.id} className="favorite-item">

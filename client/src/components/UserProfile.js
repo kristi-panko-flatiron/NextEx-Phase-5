@@ -52,6 +52,8 @@ const UserProfile = () => {
 
     return (
         <div className="user-profile-container">
+            <h1 className="gradient-text">Account Details</h1>
+            {user.image_url && <img src={user.image_url} alt={user.name} className="profile-image" />}
             {editing ? (
                 <form onSubmit={handleSave}>
                     <input

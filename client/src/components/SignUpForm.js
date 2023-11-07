@@ -32,6 +32,7 @@ const SignUpForm = () => {
 
     return (
         <div className="signup-form-container">
+            <h1 className="gradient-text">Sign Up</h1>
             <h2>Sign up for an account and start matching!</h2>
             <form onSubmit={handleSignUp} className="signup-form">
                 <input

@@ -154,7 +154,7 @@ const MatchPage = () => {
                 userId={userId}
             />
             <div className="cards-container">
-                <h2 className="match-heading">Find Your Astrological Match</h2>
+                <h2 className="gradient-text match-heading">Find Your Astrological Match</h2>
                 <div className="card-grid">
                     {users.map((user) => (
                         <Card
