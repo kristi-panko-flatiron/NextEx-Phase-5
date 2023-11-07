@@ -325,7 +325,6 @@ class BestMatchesForUser(Resource):
         matched_users = User.query.join(AstrologicalSign).filter(AstrologicalSign.sign_name.in_(best_match_sign_names)).all()
         return jsonify([matched_user.to_dict() for matched_user in matched_users])
 
-
 if __name__ == '__main__':
     api.add_resource(UserRegistration, '/register')
     api.add_resource(UserLogin, '/login')

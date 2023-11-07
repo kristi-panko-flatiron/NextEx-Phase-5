@@ -18,6 +18,7 @@ class User(db.Model):
     username = Column(String(50), nullable=False)
     _password_hash = Column(String, nullable=False)
     astrological_sign_id = Column(Integer, ForeignKey('astrological_signs.id'))
+    image_url = db.Column(db.String, nullable=True)
 
     favorites = db.relationship('User', 
                                 secondary = favorite, 
@@ -47,7 +48,8 @@ class User(db.Model):
             'name': self.name,
             'birthday': self.birthday,
             'username': self.username,
-            'astrological_sign': self.astrological_sign.to_dict()
+            'astrological_sign': self.astrological_sign.to_dict(),
+            'image_url': self.image_url
         }
 
 

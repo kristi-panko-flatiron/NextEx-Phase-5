@@ -55,6 +55,7 @@ if __name__ == '__main__':
                 username = fake.user_name(),
                 password_hash = "1234",
                 birthday = user_birthday.strftime('%Y-%m-%d'),
+                image_url=fake.image_url(),
                 astrological_sign_id = user_sign_id
             )
             users_data.append(user_data)

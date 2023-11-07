@@ -34,11 +34,10 @@ const FavoritesBar = ({ userId, fetchFavorites }) => {
             <div className="favorite-list">
                 {favorites.map((favorite) => (
                     <div key={favorite.id} className="favorite-item">
-                        {/* Display favorite user information */}
+                        <img src={favorite.image_url} alt={favorite.name} className="favorite-image" />
                         <p>{favorite.name}</p>
                         <p>{favorite.astrologicalSign}</p>
-                        {/* Add a button to remove from favorites */}
-                        <button onClick={() => removeFromFavorites(favorite)}>Remove</button>
+                        <button onClick={() => removeFromFavorites(favorite)}>💔</button>
                     </div>
                 ))}
             </div>

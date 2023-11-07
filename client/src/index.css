@@ -63,11 +63,20 @@
 }
 
 .favorite-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column; /* stack items vertically */
   margin-bottom: 10px;
   padding: 10px;
   background-color: #fff;
   border: 1px solid #ddd;
-  border-radius: 5px;
+  border-radius: 10px; /* rounded corners for the box */
+  text-align: center;
+}
+.favorite-item p, .favorite-item button {
+  margin: 5px 0; /* space above and below each element */
+  width: 100%; /* full width to center text */
 }
 
 /* Card.css */
@@ -213,4 +222,21 @@
 .login-form button:hover,
 .signup-form button:hover {
   background-color: #0056b3;
+}
+
+.card img {
+  width: 100%; /* Set the width to fill the container */
+  height: 200px; /* Fixed height for all images */
+  object-fit: cover; /* Ensures the image covers the area without stretching */
+  object-position: center; /* Centers the image within the card */
+  border-radius: 10px; /* Optional: Adds rounded corners to the images */
+}
+
+.favorite-image {
+  width: 50px; /* Set a fixed width */
+  height: 50px; /* Set a fixed height to make it square */
+  object-fit: cover; /* Ensures the image covers the area without stretching */
+  object-position: center; /* Centers the image within the frame */
+  border-radius: 50%; /* Optional: to make the image round */
+  margin-right: 10px; /* Adds some space between the image and the text */
 }
