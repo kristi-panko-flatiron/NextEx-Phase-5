@@ -11,9 +11,6 @@ from flask_bcrypt import Bcrypt
 from sqlalchemy.orm.exc import StaleDataError
 import os
 
-# class Config(object):
-#     SECRET_KEY = os.urandom(24)
-
 # Local imports
 
 # Instantiate app, set attributes

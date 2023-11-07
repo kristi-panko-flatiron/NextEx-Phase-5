@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../index.css'
 
-const FavoritesBar = ({ userId }) => {
+const FavoritesBar = ({ userId, fetchFavorites }) => {
     const [favorites, setFavorites] = useState([]);
 
     useEffect(() => {
@@ -21,7 +21,7 @@ const FavoritesBar = ({ userId }) => {
         try {
             await axios.delete(`http://localhost:5555/favorites/${userId}/${favUser.id}`);
             const updatedFavorites = favorites.filter((favorite) => favorite.id !== favUser.id);
-            setFavorites(updatedFavorites); // Use the updatedFavorites for setting the state
+            setFavorites(updatedFavorites); 
         } catch (error) {
             console.error('Error removing from favorites:', error);
         }

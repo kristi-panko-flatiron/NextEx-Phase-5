@@ -3,7 +3,6 @@
 from flask import request, make_response, session
 from flask_restful import Resource, Api
 from datetime import datetime
-from werkzeug.security import check_password_hash, generate_password_hash
 import requests
 from flask_cors import cross_origin
 from sqlalchemy.orm.exc import StaleDataError
@@ -218,40 +217,6 @@ class Favorites(Resource):
 
         favorites = user.favorites
         return jsonify([fav_user.to_dict() for fav_user in favorites]), 200
-
-    # @cross_origin()
-    # def post(self):
-    #     data = request.get_json()
-    #     user_id = data.get('user_id')
-    #     fav_user_id = data.get('fav_user_id')
-        
-    #     # Check for missing data
-    #     if not user_id or not fav_user_id:
-    #         return {'message': 'Missing user_id or fav_user_id'}, 400
-
-    #     # Prevent users from favoriting themselves
-    #     if user_id == fav_user_id:
-    #         return {'message': 'Users cannot favorite themselves'}, 400
-        
-    #     user = User.query.get(user_id)
-    #     fav_user = User.query.get(fav_user_id)
-
-    #     # Check if both users exist
-    #     if not user or not fav_user:
-    #         return {'message': 'User or favorite user not found'}, 404
-
-    #     # Check if the favorite user is already added
-    #     if fav_user in user.favorites:
-    #         return {'message': 'Favorite user already added'}, 409
-
-    #     # Add favorite user to user's favorites
-    #     try:
-    #         user.favorites.append(fav_user)
-    #         db.session.commit()
-    #         return {'message': 'Favorite added successfully'}, 201
-    #     except Exception as e:
-    #         db.session.rollback()
-    #         return {'message': 'Failed to add favorite: {}'.format(str(e))}, 500
 
     @cross_origin()
     def post(self):

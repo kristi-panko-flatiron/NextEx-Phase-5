@@ -50,18 +50,6 @@ class User(db.Model):
             'astrological_sign': self.astrological_sign.to_dict()
         }
 
-    # def to_dict(self):
-    #     return {
-    #         'id': self.id,
-    #         'name': self.name,
-    #         'birthday': self.birthday,
-    #         'username': self.username,
-    #         'astrologicalSign': [
-    #             'id': self.astrological_sign.id,
-    #             'sign_name': self.astrological_sign.sign_name,
-    #             'sign_description': self.astrological_sign.sign_description
-    #         ] if self.astrological_sign else None
-    #     }
 
     @validates('name')
     def validate_name(self, key, name):
