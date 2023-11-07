@@ -120,4 +120,3 @@ class BestMatch(db.Model):
             'astrological_sign_id': self.astrological_sign_id,
             'best_match_name': self.best_match_name,
         }
-

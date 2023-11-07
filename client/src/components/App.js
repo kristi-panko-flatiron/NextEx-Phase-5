@@ -7,6 +7,9 @@ import UserProfile from './UserProfile';
 import LoginForm from './LoginForm';
 import SignUpForm from './SignUpForm';
 import MatchPage from './MatchPage';
+import UserDetailPage from './UserDetailPage';
+import MatchesPage from './MatchesPage';
+import { Redirect } from 'react-router-dom';
 import '../index.css'
 
 const App = () => {
@@ -20,6 +23,8 @@ const App = () => {
                     <Route path="/login" component={LoginForm} />
                     <Route path="/signup" component={SignUpForm} />
                     <Route path="/matches" component={MatchPage} />
+                    <Route path="/users/:userId" component={UserDetailPage} />
+                    <Route path="/my-matches" render={() => <MatchesPage userId={localStorage.getItem('userId')} />} />
                 </Switch>
             </Layout>
             </div>
@@ -28,5 +33,3 @@ const App = () => {
 };
 
 export default App;
-
-

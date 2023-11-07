@@ -7,7 +7,7 @@ import SignUpForm from './SignUpForm';
 const HomePage = () => {
     return (
         <div className="home-container">
-            <h1>Welcome to NextEx!</h1>
+            <h1 className="app-title gradient-text">NextEx</h1> {/* Add a class name to the h1 tag */}
             <p>NextEx is a dating app designed for daters who are ready to put it all on the line. With our unique matching technology, you will either find your soulmate, or your next ex.</p>
             <div className="form-container">
                 <h2>Login</h2>
@@ -25,4 +25,3 @@ const HomePage = () => {
 };
 
 export default HomePage;
-

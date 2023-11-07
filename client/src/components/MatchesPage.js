@@ -7,23 +7,25 @@ const MatchesPage = ({ userId, handleAddToFavorites }) => {
     const [matches, setMatches] = useState([]);
 
     useEffect(() => {
-        const fetchMatches = async () => {
-            try {
-                const response = await axios.get(`http://localhost:5555/matches/${userId}`);
-                setMatches(response.data);
-            } catch (error) {
-                console.error('Error fetching matches:', error);
-            }
-        };
-
-        fetchMatches();
-    }, [userId]);
-
+        const userId = localStorage.getItem('userId'); // Assuming the user ID is stored in localStorage
+        if (userId) {
+            axios.get(`http://localhost:5555/matches/${userId}`)
+                .then(response => {
+                    setMatches(response.data);
+                })
+                .catch(error => {
+                    console.error('Error fetching matches:', error);
+                });
+        }
+    }, []);
+    
+    
     // Render your matches...
 
 
     return (
         <div className="matches-page">
+            <h1 className = "matches-title gradient-text">Your Matches</h1>
             {/* Render matched user cards */}
             {matches.map((match) => (
                 <Card

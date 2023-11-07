@@ -8,6 +8,7 @@ import '../index.css';
 const MatchPage = () => {
     const [users, setUsers] = useState([]);
     const [favorites, setFavorites] = useState([]);
+    const [matches, setMatches] = useState([]);
     const userId = localStorage.getItem('userId');
 
     useEffect(() => {
@@ -76,6 +77,29 @@ const MatchPage = () => {
     //         }
     //     }
     // };
+    // const handleAddToFavorites = async (userToAdd) => {
+    //     try {
+    //         const response = await axios.post('http://localhost:5555/favorites', {
+    //             user_id: userId,
+    //             fav_user_id: userToAdd.id
+    //         });
+    
+    //         if (response.status === 201) {
+    //             // Call fetchFavorites to refetch the favorites list
+    //             await fetchFavorites();
+    
+    //             // Now the alert for "It's a match!" can be more reactive
+    //             if (response.data.is_match) {
+    //                 alert("It's a match!");
+    //             }
+    //         }
+    //     } catch (error) {
+    //         console.error('Error adding to favorites:', error);
+    //         if (error.response && error.response.status === 409) {
+    //             console.error('User is already in favorites.');
+    //         }
+    //     }
+    // };
     const handleAddToFavorites = async (userToAdd) => {
         try {
             const response = await axios.post('http://localhost:5555/favorites', {
@@ -84,10 +108,14 @@ const MatchPage = () => {
             });
     
             if (response.status === 201) {
-                // Call fetchFavorites to refetch the favorites list
-                await fetchFavorites();
-    
-                // Now the alert for "It's a match!" can be more reactive
+                setFavorites((prevFavorites) => {
+                    if (!prevFavorites.some((fav) => fav.id === userToAdd.id)) {
+                        return [...prevFavorites, userToAdd];
+                    } else {
+                        alert('User is already in favorites.');
+                        return prevFavorites; // No change to the favorites list
+                    }
+                });
                 if (response.data.is_match) {
                     alert("It's a match!");
                 }
@@ -95,11 +123,10 @@ const MatchPage = () => {
         } catch (error) {
             console.error('Error adding to favorites:', error);
             if (error.response && error.response.status === 409) {
-                console.error('User is already in favorites.');
+                alert('User is already in favorites.');
             }
         }
     };
-    
 
     const handleRemoveFromFavorites = async (userToRemove) => {
         try {
@@ -112,6 +139,10 @@ const MatchPage = () => {
         } catch (error) {
             console.error('Error removing from favorites:', error);
         }
+    };
+
+    const addMatch = (matchedUser) => {
+        setMatches(prevMatches => [...prevMatches, matchedUser]);
     };
 
     return (

@@ -1,8 +1,8 @@
 :root {
-  --bg: #282c34;
-  --header: #fff;
-  --link: #61dafb;
-  --text: hsla(0, 0%, 100%, 0.88);
+  --bg: #F8F7FC; /* Light purple background */
+  --header: #5D5474; /* Darker purple for headers/text */
+  --link: #7C73E6; /* Bright purple for links */
+  --text: #5D5474; /* Darker purple for general text */
 }
 
 /* App.css */
@@ -12,13 +12,13 @@
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  background-color: #fff;
+  background-color: var(--bg);
 }
 
 /* NavBar.css */
 .nav-bar {
   width: 100%;
-  background-color: #333;
+  background-color: var(--header);
   overflow: hidden;
 }
 
@@ -43,17 +43,16 @@
 }
 
 .nav-links li a:hover {
-  background-color: #ddd;
-  color: black;
+  background-color: var(--link);
+  color: white;
 }
 
 /* FavoritesBar.css */
 .favorites-bar {
   width: 250px;
-  background-color: #f9f9f9;
+  background-color: var(--bg);
   padding: 20px;
   box-sizing: border-box;
-  border-right: 1px solid #ccc;
 }
 
 .favorite-list {
@@ -66,17 +65,22 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-direction: column; /* stack items vertically */
+  flex-direction: column;
   margin-bottom: 10px;
   padding: 10px;
   background-color: #fff;
-  border: 1px solid #ddd;
-  border-radius: 10px; /* rounded corners for the box */
+  border-radius: 10px;
   text-align: center;
 }
+
 .favorite-item p, .favorite-item button {
-  margin: 5px 0; /* space above and below each element */
-  width: 100%; /* full width to center text */
+  margin: 5px 0;
+  width: 100%;
+}
+
+.favorite-item:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
 }
 
 /* Card.css */
@@ -116,25 +120,16 @@
 
 .card button {
   margin-top: 10px;
-}
-
-.user-image {
-  max-width: 100%;
-  border-radius: 5px;
-  margin-bottom: 10px;
-}
-
-.add-to-fav-btn {
-  padding: 5px 10px;
-  background-color: #007bff;
+  background-color: var(--link);
   color: white;
   border: none;
+  padding: 10px 20px;
   border-radius: 5px;
   cursor: pointer;
 }
 
-.add-to-fav-btn:hover {
-  background-color: #0056b3;
+.card button:hover {
+  background-color: var(--header);
 }
 
 /* MatchPage and other new styles */
@@ -147,6 +142,7 @@
 }
 
 .match-heading {
+  color: var(--header);
   text-align: center;
   width: 100%;
   margin-bottom: 20px;
@@ -201,14 +197,14 @@
   width: 100%;
   padding: 10px;
   margin-bottom: 10px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--header);
   border-radius: 5px;
 }
 
 .user-profile-container button,
 .signup-form button,
 .login-form button {
-  background-color: #007bff;
+  background-color: var(--link);
   color: white;
   border: none;
   cursor: pointer;
@@ -216,12 +212,13 @@
 
 .signup-form h2,
 .login-form h2 {
+  color: var(--header);
   margin-bottom: 20px;
 }
 
 .login-form button:hover,
 .signup-form button:hover {
-  background-color: #0056b3;
+  background-color: var(--header);
 }
 
 .card img {
@@ -230,6 +227,12 @@
   object-fit: cover; /* Ensures the image covers the area without stretching */
   object-position: center; /* Centers the image within the card */
   border-radius: 10px; /* Optional: Adds rounded corners to the images */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px); /* Move the card up slightly */
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); /* Increase the box-shadow to give a "pop" effect */
 }
 
 .favorite-image {
@@ -239,4 +242,139 @@
   object-position: center; /* Centers the image within the frame */
   border-radius: 50%; /* Optional: to make the image round */
   margin-right: 10px; /* Adds some space between the image and the text */
+}
+
+.nav-button-link {
+  background: none;
+  border: none;
+  color: white;
+  padding: 14px 16px;
+  font: inherit;
+  cursor: pointer;
+  display: block;
+  text-align: center;
+  text-decoration: none;
+}
+
+.nav-button-link:hover {
+  background-color: #ddd;
+  color: black;
+}
+
+.favorite-item:hover {
+  transform: scale(1.05); /* Slightly scale up the favorite item */
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); /* Increase the box-shadow to give a "pop" effect */
+}
+
+.user-detail-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  margin-top: 50px; /* Adjust as needed */
+}
+
+.user-detail-image {
+  max-width: 100%; /* Ensures image is responsive and doesn't overflow its container */
+  max-height: 400px; /* Adjust as needed for a decent size */
+  width: auto; /* Maintain aspect ratio */
+  height: auto; /* Maintain aspect ratio */
+  margin-bottom: 20px; /* Space below the image */
+  border-radius: 10px; /* Optional: if you want rounded corners */
+}
+
+.user-detail-container h1 {
+  font-size: 2.5rem; /* Adjust the size as needed */
+  margin-bottom: 0.5rem;
+}
+
+.user-detail-container p {
+  font-size: 1.5rem; /* Adjust the size as needed */
+  margin-bottom: 0.25rem;
+}
+
+.back-to-matches {
+  display: inline-block;
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: var(--link); /* Bright purple for the button background */
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.back-to-matches:hover {
+  background-color: var(--header); /* Darker purple for the hover state */
+}
+
+.home-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-top: 50px;
+  color: var(--header); /* Use the dark purple for text */
+}
+
+.home-container h1 {
+  font-size: 3rem; /* Large font size for the main heading */
+  margin-bottom: 1rem;
+  color: var(--link); /* Use the bright purple for headings */
+}
+
+.home-container p {
+  font-size: 1.25rem; /* Slightly larger font size for the paragraph */
+  margin-bottom: 2rem; /* Space below the paragraph */
+}
+
+.form-container {
+  width: 100%;
+  max-width: 400px;
+  margin-bottom: 2rem;
+  padding: 2rem;
+  background-color: white; /* White background for the form areas */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  border-radius: 8px; /* Rounded corners for the form containers */
+}
+
+.form-container h2 {
+  color: var(--header); /* Dark purple text for subheadings */
+  margin-bottom: 1rem;
+}
+
+/* Link to profile styling */
+.profile-link-container {
+  margin-top: 2rem;
+}
+
+.profile-link-container a {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: var(--link); /* Bright purple for links */
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.profile-link-container a:hover {
+  background-color: var(--header); /* Darker purple on hover */
+}
+
+/* Common title style */
+.gradient-text {
+  font-size: 2.5rem;
+  background: -webkit-linear-gradient(45deg, var(--link), var(--header));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-align: center;
+  margin-bottom: 2rem;
+  text-shadow: 2px 2px 4px rgba(93, 84, 116, 0.5);
+}
+
+.matches-title,
+.app-title {
+
 }

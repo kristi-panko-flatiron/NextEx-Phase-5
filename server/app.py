@@ -359,15 +359,24 @@ class UserDetail(Resource):
         
 class UserMatches(Resource):
     def get(self, user_id):
+        # Query for the current user by ID
         user = User.query.get(user_id)
+        
+        # If the user does not exist, return a 404 error
         if not user:
             return {'message': 'User not found'}, 404
 
-        # Get mutual matches
+        # Use the mutual_matches method to get a list of matched users
+        # Ensure that this method returns a list of User objects
         matched_users = user.mutual_matches()
+
+        # Convert matched users to dictionaries to make them JSON serializable
         matched_users_data = [matched_user.to_dict() for matched_user in matched_users]
+
+        # Return the matched users data as JSON
         return jsonify(matched_users_data)
 
+        
 if __name__ == '__main__':
     api.add_resource(UserRegistration, '/register')
     api.add_resource(UserLogin, '/login')
