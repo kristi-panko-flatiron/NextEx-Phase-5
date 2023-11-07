@@ -283,7 +283,7 @@ class Favorites(Resource):
             user.favorites.append(fav_user)
             db.session.commit()
             
-            # Check if the fav_user has also favorited the user, indicating a match
+            # Check if the fav_user has also favorited the use & its a match!
             is_match = user in fav_user.favorites
             match_message = "It's a match!" if is_match else 'Favorite added successfully'
 
