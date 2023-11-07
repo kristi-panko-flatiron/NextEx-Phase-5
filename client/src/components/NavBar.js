@@ -1,6 +1,7 @@
+
 import React, { useContext } from 'react';
 import { Link, useHistory } from 'react-router-dom';
-import { AuthContext } from './AuthContext'; 
+import { AuthContext } from './AuthContext'; // Make sure the path is correct
 import '../index.css';
 
 const NavBar = () => {
@@ -9,7 +10,7 @@ const NavBar = () => {
 
     const handleLogout = () => {
         localStorage.removeItem('userId');
-        setIsLoggedIn(false); 
+        setIsLoggedIn(false);
         history.push('/login');
     };
 
@@ -17,11 +18,15 @@ const NavBar = () => {
         <nav className="nav-bar">
             <ul className="nav-links">
                 <li><Link to="/">Home</Link></li>
-                <li><Link to="/profile">Profile</Link></li>
-                {!isLoggedIn && <li><Link to="/login">Login</Link></li>}
-                <li><Link to="/signup">Sign Up</Link></li>
-                <li><Link to="/matches">Match Now</Link></li>
-                <li><Link to="/my-matches">My Matches</Link></li>
+                {isLoggedIn && <li><Link to="/profile">Profile</Link></li>}
+                {isLoggedIn && <li><Link to="/matches">Match Now</Link></li>}
+                {isLoggedIn && <li><Link to="/my-matches">My Matches</Link></li>}
+                {!isLoggedIn && (
+                    <>
+                        <li><Link to="/login">Login</Link></li>
+                        <li><Link to="/signup">Sign Up</Link></li>
+                    </>
+                )}
                 {isLoggedIn && (
                     <li>
                         <button onClick={handleLogout} className="nav-button-link">Logout</button>
@@ -33,3 +38,4 @@ const NavBar = () => {
 };
 
 export default NavBar;
+
