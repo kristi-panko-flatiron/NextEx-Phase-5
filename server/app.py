@@ -5,6 +5,9 @@ from flask_restful import Resource, Api
 from datetime import datetime
 from werkzeug.security import check_password_hash, generate_password_hash
 import requests
+from flask_cors import cross_origin
+from sqlalchemy.orm.exc import StaleDataError
+
 
 from config import app, db
 from models import *
@@ -204,39 +207,115 @@ class UsersBySign(Resource):
             matched_users.extend(users)
         return jsonify([user.to_dict() for user in matched_users])
 
+
+
 class Favorites(Resource):
-#     def get(self):
-#         favorites = Favorite.query.all()
-#         if not favorites:
-#             return make_response("No favorites found", 404)
-#         favorite_list = [favorite.to_dict() for favorite in favorites]
-#         return make_response(favorite_list, 200)
+    @cross_origin()
+    def get(self, user_id):
+        user = User.query.get(user_id)
+        if not user:
+            return {'message': 'User not found'}, 404
 
+        favorites = user.favorites
+        return jsonify([fav_user.to_dict() for fav_user in favorites]), 200
+
+    # @cross_origin()
     # def post(self):
-    #     data = request.json
-    #     new_favorite = Favorite(user_id=data['user_id'], best_match_id=data['best_match_id'])
-    #     db.session.add(new_favorite)
-    #     db.session.commit()
-    #     return make_response("Favorite added successfully", 201)
+    #     data = request.get_json()
+    #     user_id = data.get('user_id')
+    #     fav_user_id = data.get('fav_user_id')
+        
+    #     # Check for missing data
+    #     if not user_id or not fav_user_id:
+    #         return {'message': 'Missing user_id or fav_user_id'}, 400
 
+    #     # Prevent users from favoriting themselves
+    #     if user_id == fav_user_id:
+    #         return {'message': 'Users cannot favorite themselves'}, 400
+        
+    #     user = User.query.get(user_id)
+    #     fav_user = User.query.get(fav_user_id)
+
+    #     # Check if both users exist
+    #     if not user or not fav_user:
+    #         return {'message': 'User or favorite user not found'}, 404
+
+    #     # Check if the favorite user is already added
+    #     if fav_user in user.favorites:
+    #         return {'message': 'Favorite user already added'}, 409
+
+    #     # Add favorite user to user's favorites
+    #     try:
+    #         user.favorites.append(fav_user)
+    #         db.session.commit()
+    #         return {'message': 'Favorite added successfully'}, 201
+    #     except Exception as e:
+    #         db.session.rollback()
+    #         return {'message': 'Failed to add favorite: {}'.format(str(e))}, 500
+
+    @cross_origin()
     def post(self):
-        data = request.json
-        new_favorite = favorite(user_id=data['user_id'], best_match_id=data['best_match_id'])
-        db.session.add(new_favorite)
-        db.session.commit()
-        return jsonify(new_favorite.to_dict()), 201
+        data = request.get_json()
+        user_id = data.get('user_id')
+        fav_user_id = data.get('fav_user_id')
+        
+        # Check for missing data
+        if not user_id or not fav_user_id:
+            return {'message': 'Missing user_id or fav_user_id'}, 400
+
+        # Prevent users from favoriting themselves
+        if user_id == fav_user_id:
+            return {'message': 'Users cannot favorite themselves'}, 400
+        
+        user = User.query.get(user_id)
+        fav_user = User.query.get(fav_user_id)
+
+        # Check if both users exist
+        if not user or not fav_user:
+            return {'message': 'User or favorite user not found'}, 404
+
+        # Check if the favorite user is already added
+        if fav_user in user.favorites:
+            return {'message': 'Favorite user already added'}, 409
+
+        # Add favorite user to user's favorites
+        try:
+            user.favorites.append(fav_user)
+            db.session.commit()
+            
+            # Check if the fav_user has also favorited the user, indicating a match
+            is_match = user in fav_user.favorites
+            match_message = "It's a match!" if is_match else 'Favorite added successfully'
+
+            return {'message': match_message, 'is_match': is_match}, 201
+
+        except Exception as e:
+            db.session.rollback()
+            return {'message': 'Failed to add favorite: {}'.format(str(e))}, 500
 
 
-    def delete(self):
-        data = request.json
-        favorite = favorite.query.filter_by(user_id=data['user_id'], best_match_id=data['best_match_id']).first()
-        if not favorite:
-            return make_response("Favorite not found", 404)
-        
-        db.session.delete(favorite)
-        db.session.commit()
-        return make_response("Favorite removed successfully", 200)
-        
+    @cross_origin()
+    def delete(self, user_id, fav_user_id):
+        try:
+            user = User.query.get(user_id)
+            fav_user = User.query.get(fav_user_id)
+            
+            if not user or not fav_user:
+                return {'message': 'User or favorite user not found'}, 404
+
+            if fav_user in user.favorites:
+                user.favorites.remove(fav_user)
+                db.session.commit()
+                return {'message': 'Favorite removed successfully'}, 200
+            else:
+                return {'message': 'Favorite not found'}, 404
+        except sqlalchemy.orm.exc.StaleDataError as e:
+            db.session.rollback()
+            return {'message': 'Could not delete favorite: {}'.format(str(e))}, 500
+        except Exception as e:
+            db.session.rollback()
+            return {'message': 'An error occurred: {}'.format(str(e))}, 500
+
 
 class AllUsers(Resource):
     def get(self):
@@ -273,7 +352,6 @@ class BestMatchesForUser(Resource):
         user = User.query.get(user_id)
         if not user:
             return {'message': 'User not found'}, 404
-
         # Get the best matches for the user's sign
         best_matches = BestMatch.query.filter_by(astrological_sign_id=user.astrological_sign_id).all()
         best_match_sign_names = [match.best_match_name for match in best_matches]
@@ -290,7 +368,7 @@ if __name__ == '__main__':
     api.add_resource(UserManagement, '/profile/<int:user_id>')
     api.add_resource(AstrologicalSignAssignment, '/assign_astrological_sign')
     api.add_resource(UsersBySign, '/users_by_sign/<int:sign_id>')
-    api.add_resource(Favorites, '/favorites')
+    api.add_resource(Favorites, '/favorites', '/favorites/<int:user_id>', '/favorites/<int:user_id>/<int:fav_user_id>')
     api.add_resource(BestMatches, '/bestmatches/<int:sign_id>')
     api.add_resource(UsersByBestMatch, '/users_by_best_match/<int:user_id>')
     api.add_resource(AllUsers, '/users')

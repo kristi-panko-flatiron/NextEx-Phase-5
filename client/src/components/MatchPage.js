@@ -1,175 +1,238 @@
+// import React, { useState, useEffect } from 'react';
+// import axios from 'axios';
+// import Card from './Card';
+// import FavoritesBar from './FavoritesBar';
+// import '../index.css';
+
+// const MatchPage = () => {
+//     const [users, setUsers] = useState([]);
+//     const [favorites, setFavorites] = useState([]);
+//     const userId = localStorage.getItem('userId');
+
+//     useEffect(() => {
+//         const fetchMatches = async () => {
+//             try {
+//                 if (userId) {
+//                     const response = await axios.get(`http://localhost:5555/users_by_best_match/${userId}`);
+//                     if (response.status === 200) {
+//                         setUsers(response.data);
+//                     }
+//                 }
+//             } catch (error) {
+//                 console.error('Error fetching matches:', error);
+//             }
+//         };
+
+//         const fetchFavorites = async () => {
+//             try {
+//                 if (userId) {
+//                     const response = await axios.get(`http://localhost:5555/favorites/${userId}`);
+//                     if (response.status === 200) {
+//                         setFavorites(response.data);
+//                     }
+//                 }
+//             } catch (error) {
+//                 console.error('Error fetching favorites:', error);
+//             }
+//         };
+
+//         fetchMatches();
+//         fetchFavorites();
+//     }, [userId]);
+
+
+//     // const handleAddToFavorites = async (user) => {
+//     //     try {
+//     //         const response = await axios.post('http://localhost:5555/favorites', {
+//     //             user_id: userId,
+//     //             fav_user_id: user.id
+//     //         });
+//     //         if (response.status === 201) {
+//     //             setFavorites(prevFavorites => [...prevFavorites, response.data]);
+//     //         }
+//     //         } catch (error) {
+//     //         if (error.response && error.response.status === 409) {
+//     //             console.error('User is already in favorites.');
+//     //         } else {
+//     //             console.error('Error adding to favorites:', error);
+//     //         }
+//     //         }
+//     //     };
+
+//     // const handleAddToFavorites = async (user) => {
+//     //     try {
+//     //         const response = await axios.post('http://localhost:5555/favorites', {
+//     //             user_id: userId,
+//     //             fav_user_id: user.id
+//     //         });
+//     //         if (response.status === 201) {
+//     //             setFavorites(prevFavorites => [...prevFavorites, user]);
+//     //             // Check the response for a match and alert the user if there is one
+//     //             if (response.data.is_match) {
+//     //                 alert("It's a match!");
+//     //             }
+//     //         }
+//     //     } catch (error) {
+//     //         console.error('Error adding to favorites:', error);
+//     //     }
+//     // };
+
+//     const handleAddToFavorites = async (userToAdd) => {
+//         try {
+//             const response = await axios.post('http://localhost:5555/favorites', {
+//                 user_id: userId,
+//                 fav_user_id: userToAdd.id
+//             });
+//             if (response.status === 201) {
+//                 setFavorites(prevFavorites => {
+//                     if (!prevFavorites.some(user => user.id === userToAdd.id)) {
+//                         return [...prevFavorites, userToAdd];
+//                     }
+//                     return prevFavorites;
+//                 });
+//                 if (response.data.is_match) {
+//                     alert("It's a match!");
+//                 }
+//             }
+//         } catch (error) {
+//             console.error('Error adding to favorites:', error);
+//             setFavorites(prevFavorites => prevFavorites.filter(user => user.id !== userToAdd.id));
+//         }
+//     };
+    
+
+//     const handleRemoveFromFavorites = async (user) => {
+//         try {
+//             const response = await axios.delete(`http://localhost:5555/favorites/${userId}/${user.id}`); // Update the URL to include both user_id and fav_user_id
+//             if (response.status === 200) {
+//                 setFavorites(prevFavorites => prevFavorites.filter(fav => fav.id !== user.id));
+//             }
+//         } catch (error) {
+//             console.error('Error removing from favorites:', error);
+//         }
+//     };
+
+
+
+
+//     return (
+//         <div className="match-page">
+//             <FavoritesBar 
+//                 favorites={favorites}
+//                 removeFromFavorites={handleRemoveFromFavorites}
+//                 userId={userId}
+//             />
+//             <div className="cards-container">
+//                 <h2 className="match-heading">Find Your Astrological Match</h2>
+//                 <div className="card-grid">
+//                     {users.map((user) => (
+//                         <Card
+//                             key={user.id}
+//                             user={user}
+//                             onAddToFavorites={() => handleAddToFavorites(user)}
+//                         />
+//                     ))}
+//                 </div>
+//             </div>
+//         </div>
+//     );
+// };
+
+// export default MatchPage;
+
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Card from './Card';
 import FavoritesBar from './FavoritesBar';
-import '../index.css'
+import '../index.css';
 
 const MatchPage = () => {
     const [users, setUsers] = useState([]);
     const [favorites, setFavorites] = useState([]);
-    const userId = localStorage.getItem('userId'); 
-    // const [matches, setMatches] = useState([]);
+    const userId = localStorage.getItem('userId');
 
-    // useEffect(() => {
-    // const fetchMatches = async () => {
-    //     try {
-    //         const userId = localStorage.getItem('userId');
-    //         if (userId) {
-    //           // Fetch the logged-in user's astrological sign
-    //         const profileResponse = await axios.get(`http://localhost:5555/profile/${userId}`);
-    //         const userSignId = profileResponse.data.astrological_sign.id;
-            
-    //           // Fetch the best matches for the user's sign
-    //         const matchesResponse = await axios.get(`http://localhost:5555/bestmatches/${userSignId}`);
-    //         const bestMatchesSignIds = matchesResponse.data.map(match => match.astrological_sign_id);
-            
-    //           // Fetch all users
-    //         const usersResponse = await axios.get('http://localhost:5555/users');
-            
-    //           // Filter users by the best matching signs
-    //         const filteredUsers = usersResponse.data.filter(user => 
-    //             bestMatchesSignIds.includes(user.astrological_sign_id)
-    //         );
-            
-    //         setUsers(filteredUsers);
-    //         }
-    //     } catch (error) {
-    //         console.error('Error fetching matches:', error);
-    //     }
-    //     };
-        
-    //     fetchMatches();
-    // }, []);
-
-    // useEffect(() => {
-    //     const fetchMatches = async () => {
-    //         try {
-    //             const userId = localStorage.getItem('userId');
-    //             if (userId) {
-    //                 // Fetch the logged-in user's astrological sign
-    //                 const profileResponse = await axios.get(`http://localhost:5555/profile/${userId}`);
-    //                 const userSignId = profileResponse.data.astrological_sign.id;
-                    
-    //                 // Fetch the best matches for the user's sign
-    //                 const matchesResponse = await axios.get(`http://localhost:5555/bestmatches/${userSignId}`);
-    //                 const bestMatchesSignIds = matchesResponse.data.map(match => match.astrological_sign_id);
-                    
-    //                 // Fetch all users with a sign that's in the best matches
-    //                 const usersResponse = await axios.get('http://localhost:5555/users');
-    //                 const filteredUsers = usersResponse.data.filter(user => 
-    //                     bestMatchesSignIds.includes(user.astrological_sign_id)
-    //                 );
-                    
-    //                 setUsers(filteredUsers);
-    //             }
-    //         } catch (error) {
-    //             console.error('Error fetching matches:', error);
-    //         }
-    //     };
-        
-    //     fetchMatches();
-    // }, []);
-    // useEffect(() => {
-    //     const fetchMatches = async () => {
-    //         try {
-    //             const userId = localStorage.getItem('userId');
-    //             if (userId) {
-    //                 // Fetch the best matches for the user's sign
-    //                 const response = await axios.get(`http://localhost:5555/users_by_best_match/${userId}`);
-    //                 setUsers(response.data); // Assumes the API returns an array of user objects
-    //             }
-    //         } catch (error) {
-    //             console.error('Error fetching matches:', error);
-    //         }
-    //     };
-        
-    //     fetchMatches();
-    // }, []);
-    
-    // useEffect(() => {
-    //     const fetchMatches = async () => {
-    //         try {
-    //             const userId = localStorage.getItem('userId');
-    //             if (userId) {
-    //                 const profileResponse = await axios.get(`http://localhost:5555/profile/${userId}`);
-    //                 if (profileResponse.status === 200 && profileResponse.data.astrological_sign) {
-    //                     const userSignId = profileResponse.data.astrological_sign.id;
-    //                     const bestMatchesResponse = await axios.get(`http://localhost:5555/bestmatches/${userSignId}`);
-    //                     if (bestMatchesResponse.status === 200) {
-    //                         const bestMatchSignIds = bestMatchesResponse.data.map(match => match.astrological_sign_id);
-    //                         console.log(bestMatchSignIds)
-    //                         const usersResponse = await axios.get('http://localhost:5555/users');
-    //                         if (usersResponse.status === 200) {
-    //                             const filteredUsers = usersResponse.data.filter(user =>
-    //                                 bestMatchSignIds.includes(user.astrological_sign_id)
-    //                             );
-    //                             console.log(filteredUsers) 
-    //                             setUsers(filteredUsers);
-    //                         }
-    //                     }
-    //                 }
-    //             }
-    //         } catch (error) {
-    //             console.error('Error fetching matches:', error);
-    //         }
-    //     };
-    
-    //     fetchMatches();
-    // }, []);
     useEffect(() => {
-        const fetchMatches = async () => {
-            try {
-                const userId = localStorage.getItem('userId');
-                if (userId) {
-                    const response = await axios.get(`http://localhost:5555/users_by_best_match/${userId}`);
-                    if (response.status === 200) {
-                        setUsers(response.data); 
-                    }
+        const fetchMatchesAndFavorites = async () => {
+            if (userId) {
+                try {
+                    const matchesResponse = await axios.get(`http://localhost:5555/users_by_best_match/${userId}`);
+                    setUsers(matchesResponse.data || []);
+                } catch (error) {
+                    console.error('Error fetching matches:', error);
                 }
-            } catch (error) {
-                console.error('Error fetching matches:', error);
+                try {
+                    const favoritesResponse = await axios.get(`http://localhost:5555/favorites/${userId}`);
+                    setFavorites(favoritesResponse.data || []);
+                } catch (error) {
+                    console.error('Error fetching favorites:', error);
+                }
             }
         };
-    
-        fetchMatches();
-    }, []);
-    
-    
 
+        fetchMatchesAndFavorites();
+    }, [userId]);
 
-
-    const handleAddToFavorites = async (user) => { 
+    const handleAddToFavorites = async (userToAdd) => {
         try {
             const response = await axios.post('http://localhost:5555/favorites', {
                 user_id: userId,
-                best_match_id: user.id
+                fav_user_id: userToAdd.id
             });
-            setFavorites((prevFavorites) => [...prevFavorites, response.data]);
+
+            if (response.status === 201) {
+                // Update the state with the new list of favorites
+                setFavorites(prevFavorites => {
+                    // If the userToAdd is not already in favorites, add it
+                    const updatedFavorites = prevFavorites.find(fav => fav.id === userToAdd.id)
+                        ? prevFavorites
+                        : [...prevFavorites, userToAdd];
+                    console.log('Updated favorites:', updatedFavorites);
+                    return updatedFavorites;
+                });
+                console.log('Current favorites after update:', favorites);
+                // alert user for match
+                if (response.data.is_match) {
+                    alert("It's a match!");
+                }
+            }
         } catch (error) {
             console.error('Error adding to favorites:', error);
+            if (error.response && error.response.status === 409) {
+                console.error('User is already in favorites.');
+            } else {
+                console.error('Error adding to favorites:', error);
+            }
         }
     };
 
-    const handleRemoveFromFavorites = (user) => {
-        // Remove a user from the favorites list
-        setFavorites(prevFavorites => prevFavorites.filter(fav => fav.id !== user.id));
+    const handleRemoveFromFavorites = async (userToRemove) => {
+        try {
+            const response = await axios.delete(`http://localhost:5555/favorites/${userId}/${userToRemove.id}`);
+
+            if (response.status === 200) {
+                // Update the state with the new list of favorites
+                setFavorites(prevFavorites => prevFavorites.filter(user => user.id !== userToRemove.id));
+            }
+        } catch (error) {
+            console.error('Error removing from favorites:', error);
+        }
     };
 
     return (
         <div className="match-page">
             <FavoritesBar 
-                favorites={favorites} 
+                favorites={favorites}
                 removeFromFavorites={handleRemoveFromFavorites}
-                userId={userId} 
+                userId={userId}
             />
             <div className="cards-container">
                 <h2 className="match-heading">Find Your Astrological Match</h2>
                 <div className="card-grid">
                     {users.map((user) => (
-                        <Card 
-                            key={user.id} 
-                            user={user} 
-                            onAddToFavorites={() => handleAddToFavorites(user)} 
+                        <Card
+                            key={user.id}
+                            user={user}
+                            onAddToFavorites={() => handleAddToFavorites(user)}
                         />
                     ))}
                 </div>

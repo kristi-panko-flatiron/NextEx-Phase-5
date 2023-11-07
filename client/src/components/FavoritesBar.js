@@ -2,28 +2,31 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../index.css'
 
-const FavoritesBar = ({userId}) => {
+const FavoritesBar = ({ userId }) => {
     const [favorites, setFavorites] = useState([]);
+
     useEffect(() => {
-        axios.get('http://localhost:5555/favorites')
-        .then((response) => {
-            setFavorites(response.data);
-        })
-        .catch((error) => {
-        });
-    }, []);
+        if (userId) {
+            axios.get(`http://localhost:5555/favorites/${userId}`)
+            .then((response) => {
+                setFavorites(response.data);
+            })
+            .catch((error) => {
+                console.error('Error fetching favorites:', error);
+            });
+        }
+    }, [userId]);
 
-
-    const removeFromFavorites = async (user) => {
+    const removeFromFavorites = async (favUser) => {
         try {
-            await axios.delete('http://localhost:5555/favorites', { data: { user_id: userId, best_match_id: user.id } });
-            const updatedFavorites = favorites.filter((fav) => fav.id !== user.id);
-            setFavorites(updatedFavorites);
+            await axios.delete(`http://localhost:5555/favorites/${userId}/${favUser.id}`);
+            const updatedFavorites = favorites.filter((favorite) => favorite.id !== favUser.id);
+            setFavorites(updatedFavorites); // Use the updatedFavorites for setting the state
         } catch (error) {
             console.error('Error removing from favorites:', error);
         }
     };
-    
+
 
     return (
         <aside className="favorites-bar">
@@ -42,6 +45,5 @@ const FavoritesBar = ({userId}) => {
         </aside>
     );
 };
-
 
 export default FavoritesBar;
