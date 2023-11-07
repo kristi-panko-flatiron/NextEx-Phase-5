@@ -14,6 +14,7 @@ import '../index.css'
 
 const App = () => {
     return (
+        <div className ="app-background">
         <Router>
             <div className = "app-container">
             <Layout>
@@ -29,6 +30,7 @@ const App = () => {
             </Layout>
             </div>
         </Router>
+        </div>
     );
 };
 

@@ -27,6 +27,7 @@ const MatchesPage = ({ userId, handleAddToFavorites }) => {
         <div className="matches-page">
             <h1 className = "matches-title gradient-text">Your Matches</h1>
             {/* Render matched user cards */}
+            <div className="card-grid">
             {matches.map((match) => (
                 <Card
                     key={match.id}
@@ -35,6 +36,7 @@ const MatchesPage = ({ userId, handleAddToFavorites }) => {
                 />
             ))}
         </div>
+    </div>
     );
 };
 
