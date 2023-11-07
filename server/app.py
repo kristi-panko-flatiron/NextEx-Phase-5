@@ -3,7 +3,6 @@
 from flask import request, make_response, session
 from flask_restful import Resource, Api
 from datetime import datetime
-import requests
 from flask_cors import cross_origin
 from sqlalchemy.orm.exc import StaleDataError
 
@@ -268,20 +267,6 @@ class Favorites(Resource):
         except Exception as e:
             db.session.rollback()
             return {'message': 'Failed to add favorite: {}'.format(str(e))}, 500
-        # try:
-        #     user.favorites.append(fav_user)
-        #     db.session.commit()
-            
-        #     # Check if the fav_user has also favorited the use & its a match!
-        #     is_match = user in fav_user.favorites
-        #     match_message = "It's a match!" if is_match else 'Favorite added successfully'
-
-        #     return {'message': match_message, 'is_match': is_match}, 201
-
-        # except Exception as e:
-        #     db.session.rollback()
-        #     return {'message': 'Failed to add favorite: {}'.format(str(e))}, 500
-
 
     @cross_origin()
     def delete(self, user_id, fav_user_id):

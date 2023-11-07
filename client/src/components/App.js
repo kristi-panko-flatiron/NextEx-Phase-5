@@ -1,4 +1,3 @@
-// App.js
 import React from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import Layout from './Layout';
@@ -9,11 +8,13 @@ import SignUpForm from './SignUpForm';
 import MatchPage from './MatchPage';
 import UserDetailPage from './UserDetailPage';
 import MatchesPage from './MatchesPage';
+import { AuthProvider } from './AuthContext';
 import { Redirect } from 'react-router-dom';
 import '../index.css'
 
 const App = () => {
     return (
+    <AuthProvider>
         <div className ="app-background">
         <Router>
             <div className = "app-container">
@@ -31,6 +32,7 @@ const App = () => {
             </div>
         </Router>
         </div>
+    </AuthProvider>
     );
 };
 
