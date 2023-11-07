@@ -26,6 +26,11 @@ class User(db.Model):
                                 secondaryjoin = (favorite.c.fav_user_id == id),
                                 backref = 'matches'
                                 )
+    
+    def mutual_matches(self):
+        # This method checks for mutual matches by comparing favorites and favorited_by lists
+        matches = [user for user in self.favorites if self in user.favorites]
+        return matches
 
     @hybrid_property
     def password_hash ( self ) :

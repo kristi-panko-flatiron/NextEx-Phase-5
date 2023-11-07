@@ -247,16 +247,40 @@ class Favorites(Resource):
         try:
             user.favorites.append(fav_user)
             db.session.commit()
-            
-            # Check if the fav_user has also favorited the use & its a match!
+
+            # Check if the fav_user has also favorited the user & it's a match!
             is_match = user in fav_user.favorites
             match_message = "It's a match!" if is_match else 'Favorite added successfully'
 
-            return {'message': match_message, 'is_match': is_match}, 201
+                # Prepare response data
+            response_data = {
+                    'message': match_message,
+                    'is_match': is_match
+                }
+
+                # If it's a match, include the matched user's info in the response
+            if is_match:
+                    matched_user_data = fav_user.to_dict()
+                    response_data['matched_user'] = matched_user_data
+
+            return jsonify(response_data), 201
 
         except Exception as e:
             db.session.rollback()
             return {'message': 'Failed to add favorite: {}'.format(str(e))}, 500
+        # try:
+        #     user.favorites.append(fav_user)
+        #     db.session.commit()
+            
+        #     # Check if the fav_user has also favorited the use & its a match!
+        #     is_match = user in fav_user.favorites
+        #     match_message = "It's a match!" if is_match else 'Favorite added successfully'
+
+        #     return {'message': match_message, 'is_match': is_match}, 201
+
+        # except Exception as e:
+        #     db.session.rollback()
+        #     return {'message': 'Failed to add favorite: {}'.format(str(e))}, 500
 
 
     @cross_origin()
@@ -333,6 +357,17 @@ class UserDetail(Resource):
         else:
             return {'message': 'User not found'}, 404
         
+class UserMatches(Resource):
+    def get(self, user_id):
+        user = User.query.get(user_id)
+        if not user:
+            return {'message': 'User not found'}, 404
+
+        # Get mutual matches
+        matched_users = user.mutual_matches()
+        matched_users_data = [matched_user.to_dict() for matched_user in matched_users]
+        return jsonify(matched_users_data)
+
 if __name__ == '__main__':
     api.add_resource(UserRegistration, '/register')
     api.add_resource(UserLogin, '/login')
@@ -346,4 +381,5 @@ if __name__ == '__main__':
     api.add_resource(AllUsers, '/users')
     api.add_resource(BestMatchesForUser, '/best_matches_for_user/<int:user_id>')
     api.add_resource(UserDetail, '/user/<int:user_id>')
+    api.add_resource(UserMatches, '/matches/<int:user_id>')
     app.run(port=5555, debug=True)
