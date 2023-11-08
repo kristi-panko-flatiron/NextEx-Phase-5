@@ -9,7 +9,6 @@ import MatchPage from './MatchPage';
 import UserDetailPage from './UserDetailPage';
 import MatchesPage from './MatchesPage';
 import { AuthProvider } from './AuthContext';
-import { Redirect } from 'react-router-dom';
 import '../index.css'
 
 const App = () => {

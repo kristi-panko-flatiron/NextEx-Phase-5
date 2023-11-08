@@ -43,63 +43,6 @@ const MatchPage = () => {
             }
         };
 
-
-    // const handleAddToFavorites = async (userToAdd) => {
-    //     try {
-    //         const response = await axios.post('http://localhost:5555/favorites', {
-    //             user_id: userId,
-    //             fav_user_id: userToAdd.id
-    //         });
-    
-    //         if (response.status === 201) {
-    //             const newUserToAdd = response.data; 
-    
-    //             setFavorites((prevFavorites) => {
-    //                 if (!prevFavorites.some((fav) => fav.id === newUserToAdd.id)) {
-    //                     // If the user is not already in the favorites, add it.
-    //                     return [...prevFavorites, newUserToAdd];
-    //                 } else {
-    //                     // If the user is already in favorites, just return the previous state.
-    //                     return prevFavorites;
-    //                 }
-    //             });
-    
-    //             // consider a more sophisticated approach like a modal or toast notification**
-    //             if (response.data.is_match) {
-    //                 alert("It's a match!");
-    //             }
-    //         }
-    //     } catch (error) {
-    //         console.error('Error adding to favorites:', error);
-    //         // Handle error responses from the server, for example, if the user is already a favorite.
-    //         if (error.response && error.response.status === 409) {
-    //             console.error('User is already in favorites.');
-    //         }
-    //     }
-    // };
-    // const handleAddToFavorites = async (userToAdd) => {
-    //     try {
-    //         const response = await axios.post('http://localhost:5555/favorites', {
-    //             user_id: userId,
-    //             fav_user_id: userToAdd.id
-    //         });
-    
-    //         if (response.status === 201) {
-    //             // Call fetchFavorites to refetch the favorites list
-    //             await fetchFavorites();
-    
-    //             // Now the alert for "It's a match!" can be more reactive
-    //             if (response.data.is_match) {
-    //                 alert("It's a match!");
-    //             }
-    //         }
-    //     } catch (error) {
-    //         console.error('Error adding to favorites:', error);
-    //         if (error.response && error.response.status === 409) {
-    //             console.error('User is already in favorites.');
-    //         }
-    //     }
-    // };
     const handleAddToFavorites = async (userToAdd) => {
         try {
             const response = await axios.post('http://localhost:5555/favorites', {

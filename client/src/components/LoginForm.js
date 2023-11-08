@@ -11,19 +11,6 @@ const LoginForm = () => {
     const { setIsLoggedIn } = useContext(AuthContext);
     let history = useHistory();
 
-
-    // const handleLogin = (e) => {
-    //     e.preventDefault();
-    //     axios.post('http://localhost:5555/login', { username, password })
-    //         .then(response => {
-    //             // Store the user ID in local storage
-    //             localStorage.setItem('userId', response.data.user_id);
-    //             history.push('/matches');
-    //         })
-    //         .catch(error => {
-    //             console.error("Error logging in", error);
-    //         });
-    // };
     const handleLogin = (e) => {
         e.preventDefault();
         axios.post('http://localhost:5555/login', { username, password })
