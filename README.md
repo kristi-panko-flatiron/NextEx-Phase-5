@@ -1,13 +1,13 @@
 NextEx is a simple dating app that matches users based on the compatibility of their astrological sign. 
 
-Users will be able to: 
--Create a user profile and be assigned an astrological sign according to the birthdate entered
--Retrieve potential matches based on top 2 most compatible astrological sign
--Update account details
-- View the profiles of potential matches
--Favorite and match with users who have favorited you
--View all confirmed matches on a match page
--Delete your account when you’ve found your next ex!
+Users will be able to: <br></br>
+-Create a user profile and be assigned an astrological sign according to the birthdate entered<br></br>
+-Retrieve potential matches based on top 2 most compatible astrological sign<br></br>
+-Update account details<br></br>
+- View the profiles of potential matches<br></br>
+-Favorite and match with users who have favorited you<br></br>
+-View all confirmed matches on a match page<br></br>
+-Delete your account when you’ve found your next ex!<br></br>
 
 
 Domain Model: <br></br>
