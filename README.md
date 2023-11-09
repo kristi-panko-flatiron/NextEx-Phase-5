@@ -8,6 +8,8 @@ Users will be able to:
 - View all confirmed matches on a match page
 - Delete your account when you’ve found your next ex!
 
+https://www.facebook.com/krispanko/videos/916232703437755/?notif_id=1699551829924463&notif_t=video_processed&ref=notif
+
 
 Domain Model: <br></br>
 ![Screenshot 2023-10-26 at 10 39 09 AM](https://github.com/kristi-panko-flatiron/NextEx/assets/136921157/f8b30ab4-0297-4ebb-bee9-fabb41e3d666)
