@@ -4,7 +4,7 @@ Users will be able to: <br></br>
 -Create a user profile and be assigned an astrological sign according to the birthdate entered<br></br>
 -Retrieve potential matches based on top 2 most compatible astrological sign<br></br>
 -Update account details<br></br>
-- View the profiles of potential matches<br></br>
+-View the profiles of potential matches<br></br>
 -Favorite and match with users who have favorited you<br></br>
 -View all confirmed matches on a match page<br></br>
 -Delete your account when you’ve found your next ex!<br></br>
